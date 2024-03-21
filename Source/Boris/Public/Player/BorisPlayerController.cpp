@@ -87,8 +87,10 @@ void ABorisPlayerController::BeginPlay()
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 
-	check(Subsystem);
-	Subsystem->AddMappingContext(BorisContext, 0);
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(BorisContext, 0);
+	}
 
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;

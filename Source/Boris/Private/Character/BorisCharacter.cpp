@@ -5,6 +5,8 @@
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/BorisPlayerState.h"
+#include "Player/BorisPlayerController.h"
+#include "UI/HUD/BorisHUD.h"
 
 ABorisCharacter::ABorisCharacter()
 {
@@ -41,4 +43,12 @@ void ABorisCharacter::InitAbilityActorInfo()
 	BorisPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BorisPlayerState, this);
 	AbilitySystemComponent = BorisPlayerState->GetAbilitySystemComponent();
 	AttributeSet = BorisPlayerState->GetAttributeSet();
+
+	if (ABorisPlayerController* BorisPlayerController = Cast<ABorisPlayerController>(GetController()))
+	{
+		if (ABorisHUD* BorisHUD = Cast<ABorisHUD>(BorisPlayerController->GetHUD()))
+		{
+			BorisHUD->InitOverlay(BorisPlayerController, BorisPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
