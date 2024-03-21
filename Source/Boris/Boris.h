@@ -4,3 +4,5 @@
 
 #include "CoreMinimal.h"
 
+#define CUSTOM_DEPTH_RED_OUTLINE 250
+#define NET_UPDATE_FRECUENCY 250
