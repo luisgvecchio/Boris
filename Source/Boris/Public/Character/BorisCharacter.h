@@ -16,5 +16,8 @@ class BORIS_API ABorisCharacter : public ACharacterBase
 	
 public:
 	ABorisCharacter();
-
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+private:
+	void InitAbilityActorInfo();
 };

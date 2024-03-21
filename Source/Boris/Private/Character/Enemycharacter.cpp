@@ -1,28 +1,40 @@
 // Copyright Three Headed Monkey Studios
 
 
-#include "Character/Enemycharacter.h"
+#include "Character/EnemyCharacter.h"
 #include "Boris/Boris.h"
+#include "AbilitySystem/BorisAbilitySystemComponent.h"
 
-AEnemycharacter::AEnemycharacter()
+
+AEnemyCharacter::AEnemyCharacter()
 {
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+	
+
+	AttributeSet = CreateDefaultSubobject<UAttributeSet>("AttributeSet");
 }
 
-void AEnemycharacter::BeginPlay()
+void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Outline
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED_OUTLINE);
+	//Abilitysystem Initialization
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
-void AEnemycharacter::HighlightActor()
+void AEnemyCharacter::HighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);
 	Weapon->SetRenderCustomDepth(true);
 }
 
-void AEnemycharacter::UnHighlightActor()
+void AEnemyCharacter::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
