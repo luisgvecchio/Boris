@@ -10,7 +10,7 @@ AEnemyCharacter::AEnemyCharacter()
 {
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");
+	AbilitySystemComponent = CreateDefaultSubobject<UBorisAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
@@ -25,7 +25,7 @@ void AEnemyCharacter::BeginPlay()
 	//Outline
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED_OUTLINE);
 	//Abilitysystem Initialization
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	Cast<UBorisAbilitySystemComponent>(GetAbilitySystemComponent())->InitActorInfo(this, this);
 }
 
 void AEnemyCharacter::HighlightActor()

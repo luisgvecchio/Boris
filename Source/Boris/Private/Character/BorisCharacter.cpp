@@ -3,6 +3,7 @@
 
 #include "Character/BorisCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/BorisAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/BorisPlayerState.h"
 #include "Player/BorisPlayerController.h"
@@ -40,8 +41,10 @@ void ABorisCharacter::InitAbilityActorInfo()
 {
 	ABorisPlayerState* BorisPlayerState = GetPlayerState<ABorisPlayerState>();
 	check(BorisPlayerState);
-	BorisPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(BorisPlayerState, this);
 	AbilitySystemComponent = BorisPlayerState->GetAbilitySystemComponent();
+
+	Cast<UBorisAbilitySystemComponent>(AbilitySystemComponent)->InitActorInfo(BorisPlayerState, this);
+
 	AttributeSet = BorisPlayerState->GetAttributeSet();
 
 	if (ABorisPlayerController* BorisPlayerController = Cast<ABorisPlayerController>(GetController()))
