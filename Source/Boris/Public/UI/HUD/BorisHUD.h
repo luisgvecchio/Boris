@@ -9,7 +9,7 @@
 class UBorisUserWidget;
 
 class UAttributeSet;
-class UAbilitySystemComponent;
+class UBorisAbilitySystemComponent;
 class UOverlayWidgetController;
 class UBorisUserWidget;
 struct FWidgetControllerParams;
@@ -26,7 +26,7 @@ public:
 
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 
-	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
+	void InitOverlay(APlayerController* PC, APlayerState* PS, UBorisAbilitySystemComponent* ASC, UAttributeSet* AS);
 
 	UPROPERTY()
 	TObjectPtr<UBorisUserWidget>  OverlayWidget;

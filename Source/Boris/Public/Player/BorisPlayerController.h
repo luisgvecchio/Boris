@@ -3,12 +3,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameplayTagContainer.h"
 #include "BorisPlayerController.generated.h"
 
+struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
 class IEnemyInterface;
-struct FInputActionValue;
+class UBorisInputConfig;
+class UBorisAbilitySystemComponent;
+//class USplineComponent;
 
 /**
  * 
@@ -36,7 +40,34 @@ private:
 		void Move(const FInputActionValue& InputActionValue);
 
 		void CursorTrace();
+		void AutoRun();
 
 		IEnemyInterface* LastActor;
 		IEnemyInterface* CurrentActor;
+
+		FHitResult CursorHit;
+
+		void AbilityInputTagPressed(FGameplayTag InputTag);
+		void AbilityInputTagReleased(FGameplayTag InputTag);
+		void AbilityInputTagHeld(FGameplayTag InputTag);
+
+		UPROPERTY(EditDefaultsOnly, Category = "Input")
+		TObjectPtr<UBorisInputConfig> InputConfig;
+
+		UPROPERTY()
+		TObjectPtr<UBorisAbilitySystemComponent> BorisAbilitySystemComponent;
+
+		UBorisAbilitySystemComponent* GetASC();
+
+		FVector CachedDestination = FVector::ZeroVector;
+		float FollowTime = 0.f;
+		float ShortPressThreshold = 0.5f;
+		bool bAutoRunning = false;
+		bool bTargeting = false;
+
+		UPROPERTY(EditDefaultsOnly)
+		float AutoRunAcceptanceRadius = 50.f;
+
+		UPROPERTY(VisibleAnywhere)
+		TObjectPtr<class USplineComponent> Spline;
 };

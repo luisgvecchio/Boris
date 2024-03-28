@@ -1,27 +1,69 @@
 // Copyright Three Headed Monkey Studios
 
-
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
+#include "AbilitySystem/BorisGameplayAbility.h"
+#include "BorisGameplayTags.h"
+
+
+void UBorisAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
+{
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+
+		if (const UBorisGameplayAbility* BorisAbility = Cast<UBorisGameplayAbility>(AbilitySpec.Ability))
+		{
+			AbilitySpec.DynamicAbilityTags.AddTag(BorisAbility->StartupInputTag);
+			GiveAbility(AbilitySpec);
+		}
+	}
+}
 
 void UBorisAbilitySystemComponent::InitActorInfo(AActor* InOwnerActor, AActor* InAvatarActor)
 {
 	InitAbilityActorInfo(InOwnerActor, InAvatarActor);
 
-	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UBorisAbilitySystemComponent::EffectApplied);
+	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UBorisAbilitySystemComponent::ClientEffectApplied);
+
+	const FBorisGameplayTags& GameplayTags = FBorisGameplayTags::Get();
 }
 
-void UBorisAbilitySystemComponent::EffectApplied(UAbilitySystemComponent* AbilitySystemComponent,
+void UBorisAbilitySystemComponent::ClientEffectApplied_Implementation(UAbilitySystemComponent* AbilitySystemComponent,
 	const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
 	FGameplayTagContainer TagContainer;
 	EffectSpec.GetAllAssetTags(TagContainer);
 
-	for (auto Tag : TagContainer)
+	EffectAssetTags.Broadcast(TagContainer);
+}
+
+void UBorisAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
+{
+	if (!InputTag.IsValid()) return;
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		//TODO: Broadcast tag to Widget Controller
-		const FString Msg = FString::Printf(TEXT("GE TAG : %s"), *Tag.ToString());
-		GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, Msg);
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			AbilitySpecInputPressed(AbilitySpec);
+			if (!AbilitySpec.IsActive())
+			{
+				TryActivateAbility(AbilitySpec.Handle);
+			}
+		}
 	}
 
-	EffectAssetTags.Broadcast(TagContainer);
+}
+
+void UBorisAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
+{
+	if (!InputTag.IsValid()) return;
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			AbilitySpecInputReleased(AbilitySpec);
+		}
+	}
 }

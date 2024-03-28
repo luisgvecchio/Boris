@@ -67,6 +67,7 @@ void UBorisAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackDat
 	}
 }
 
+//TODO: Check if we can erase this, it is only clamping values. We can Clamp them better in PostAttributreChange
 void UBorisAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
@@ -83,5 +84,10 @@ void UBorisAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
+
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
 
 }

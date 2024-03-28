@@ -7,7 +7,7 @@
 #include "AbilitySystemInterface.h"
 #include "BorisPlayerState.generated.h"
 
-class UAbilitySystemComponent;
+class UBorisAbilitySystemComponent;
 class UAttributeSet;
 
 /**
@@ -20,12 +20,12 @@ class BORIS_API ABorisPlayerState : public APlayerState, public IAbilitySystemIn
 
 public:
 	ABorisPlayerState();
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UBorisAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 protected:
 
 	UPROPERTY()
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UBorisAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;

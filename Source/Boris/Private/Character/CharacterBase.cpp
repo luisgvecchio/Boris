@@ -2,6 +2,7 @@
 
 
 #include "Character/CharacterBase.h"
+#include "AbilitySystem/BorisAbilitySystemComponent.h"
 
 
 ACharacterBase::ACharacterBase()
@@ -14,7 +15,7 @@ ACharacterBase::ACharacterBase()
 
 }
 
-UAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
+UBorisAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
@@ -22,5 +23,14 @@ UAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();	
+}
+
+void ACharacterBase::AddCharacterAbilities()
+{
+	UBorisAbilitySystemComponent* BorisASC = AbilitySystemComponent;
+	if (!HasAuthority()) 
+		return;
+
+	BorisASC->AddCharacterAbilities(StartupAbilities);
 }
 

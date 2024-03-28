@@ -7,8 +7,9 @@
 #include "GameFramework/Character.h"
 #include "CharacterBase.generated.h"
 
-class UAbilitySystemComponent;
+class UBorisAbilitySystemComponent;
 class UAttributeSet;
+class UGameplayAbility;
 
 UCLASS()
 class BORIS_API ACharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -18,7 +19,7 @@ class BORIS_API ACharacterBase : public ACharacter, public IAbilitySystemInterfa
 public:
 	ACharacterBase();
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UBorisAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 protected:
@@ -28,8 +29,15 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
 	UPROPERTY()
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UBorisAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	void AddCharacterAbilities();
+
+private:
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

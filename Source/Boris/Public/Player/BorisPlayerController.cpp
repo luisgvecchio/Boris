@@ -1,27 +1,37 @@
 // Copyright Three Headed Monkey Studios
 
-
 #include "Player/BorisPlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
+#include "BorisGameplayTags.h"
 #include "EnhancedInputSubsystems.h"
-#include "EnhancedInputComponent.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
+#include "AbilitySystem/BorisAbilitySystemComponent.h"
+#include "Components/SplineComponent.h"
+#include "Input/BorisInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
 
 ABorisPlayerController::ABorisPlayerController()
 {
 	bReplicates = true;
+
+	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
 }
+
+
 
 void ABorisPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
 	CursorTrace();
+	AutoRun();
 }
 
 void ABorisPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 
 	if (!CursorHit.bBlockingHit)
@@ -30,54 +40,122 @@ void ABorisPlayerController::CursorTrace()
 	LastActor = CurrentActor;
 
 	CurrentActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-
-	/**
-	 * Line trace from cursor. There are several scenarios:
-	 *  A. LastActor is null && ThisActor is null
-	 *		- Do nothing
-	 *	B. LastActor is null && ThisActor is valid
-	 *		- Highlight ThisActor
-	 *	C. LastActor is valid && ThisActor is null
-	 *		- UnHighlight LastActor
-	 *	D. Both actors are valid, but LastActor != ThisActor
-	 *		- UnHighlight LastActor, and Highlight ThisActor
-	 *	E. Both actors are valid, and are the same actor
-	 *		- Do nothing
-	 */
-
-	if (LastActor == nullptr)
+		
+	if (LastActor != CurrentActor)
 	{
-		if (CurrentActor != nullptr)
+		if (LastActor) LastActor->UnHighlightActor();
+		if (CurrentActor) CurrentActor->HighlightActor();
+	}
+}
+
+void ABorisPlayerController::AutoRun()
+{
+	if (!bAutoRunning) return;
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+		ControlledPawn->AddMovementInput(Direction);
+
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if (DistanceToDestination <= AutoRunAcceptanceRadius)
 		{
-			// Case B
-			CurrentActor->HighlightActor();
-		}
-		else
-		{
-			// Case A - both are null, do nothing
+			bAutoRunning = false;
 		}
 	}
-	else // LastActor is valid
+}
+
+void ABorisPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	//GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
+	if (InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB))
 	{
-		if (CurrentActor == nullptr)
+		bTargeting = CurrentActor ? true : false;
+		bAutoRunning = false;
+	}
+}
+
+void ABorisPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	//GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Blue, *InputTag.ToString());
+	if (!InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB))
+	{
+		if (GetASC())
 		{
-			// Case C
-			LastActor->UnHighlightActor();
+			GetASC()->AbilityInputTagReleased(InputTag);
 		}
-		else // both actors are valid
+		return;
+	}
+
+	if (bTargeting)
+	{
+		if (GetASC())
 		{
-			if (LastActor != CurrentActor)
-			{
-				// Case D
-				LastActor->UnHighlightActor();
-				CurrentActor->HighlightActor();
-			}
-			else
-			{
-				// Case E - do nothing
-			}
+			GetASC()->AbilityInputTagReleased(InputTag);
 		}
 	}
+	else
+	{
+		const APawn* ControlledPawn = GetPawn();
+		if (FollowTime <= ShortPressThreshold && ControlledPawn)
+		{
+			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
+			{
+				Spline->ClearSplinePoints();
+				for (const FVector& PointLoc : NavPath->PathPoints)
+				{
+					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+					//DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Green, false, 5.f);
+				}
+				CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num() - 1];
+				bAutoRunning = true;
+			}
+		}
+		FollowTime = 0.f;
+		bTargeting = false;
+	}
+}
+
+void ABorisPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	//GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Green, *InputTag.ToString());
+	if (!InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB))
+	{
+		if (GetASC())
+		{
+			GetASC()->AbilityInputTagHeld(InputTag);
+		}
+		return;
+	}
+
+	if (bTargeting)
+	{
+		if (GetASC())
+		{
+			GetASC()->AbilityInputTagHeld(InputTag);
+		}
+	}
+	else
+	{
+		FollowTime += GetWorld()->GetDeltaSeconds();
+
+		if (CursorHit.bBlockingHit) CachedDestination = CursorHit.ImpactPoint;
+
+		if (APawn* ControlledPawn = GetPawn())
+		{
+			const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+			ControlledPawn->AddMovementInput(WorldDirection);
+		}
+	}
+}
+
+UBorisAbilitySystemComponent* ABorisPlayerController::GetASC()
+{
+	if (BorisAbilitySystemComponent == nullptr)
+	{
+		BorisAbilitySystemComponent = Cast<UBorisAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return BorisAbilitySystemComponent;
 }
 
 void ABorisPlayerController::BeginPlay()
@@ -105,12 +183,10 @@ void ABorisPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
+	UBorisInputComponent* BorisInputComponent = CastChecked<UBorisInputComponent>(InputComponent);
 
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABorisPlayerController::Move); 
-
-
-
+	//BorisInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABorisPlayerController::Move);
+	BorisInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
 void ABorisPlayerController::Move(const FInputActionValue& InputActionValue)

@@ -27,6 +27,8 @@ void ABorisCharacter::PossessedBy(AController* NewController)
 
 	// Init ability actor info for the Server
 	InitAbilityActorInfo();
+
+	AddCharacterAbilities();
 }
 
 void ABorisCharacter::OnRep_PlayerState()
@@ -41,9 +43,9 @@ void ABorisCharacter::InitAbilityActorInfo()
 {
 	ABorisPlayerState* BorisPlayerState = GetPlayerState<ABorisPlayerState>();
 	check(BorisPlayerState);
-	AbilitySystemComponent = BorisPlayerState->GetAbilitySystemComponent();
+	AbilitySystemComponent = Cast<UBorisAbilitySystemComponent>(BorisPlayerState->GetAbilitySystemComponent());
 
-	Cast<UBorisAbilitySystemComponent>(AbilitySystemComponent)->InitActorInfo(BorisPlayerState, this);
+	AbilitySystemComponent->InitActorInfo(BorisPlayerState, this);
 
 	AttributeSet = BorisPlayerState->GetAttributeSet();
 

@@ -17,7 +17,7 @@ ABorisPlayerState::ABorisPlayerState()
 	AttributeSet = CreateDefaultSubobject<UBorisAttributeSet>("AttributeSet");
 }
 
-UAbilitySystemComponent* ABorisPlayerState::GetAbilitySystemComponent() const
+UBorisAbilitySystemComponent* ABorisPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
