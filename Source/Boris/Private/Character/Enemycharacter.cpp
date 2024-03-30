@@ -2,8 +2,11 @@
 
 
 #include "Character/EnemyCharacter.h"
+#include "Components/WidgetComponent.h"
 #include "Boris/Boris.h"
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
+#include "AbilitySystem/BorisAttributeSet.h"
+#include "UI/Widgets/BorisUserWidget.h"
 
 
 AEnemyCharacter::AEnemyCharacter()
@@ -12,10 +15,12 @@ AEnemyCharacter::AEnemyCharacter()
 
 	AbilitySystemComponent = CreateDefaultSubobject<UBorisAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
-	
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);	
 
-	AttributeSet = CreateDefaultSubobject<UAttributeSet>("AttributeSet");
+	AttributeSet = CreateDefaultSubobject<UBorisAttributeSet>("AttributeSet");
+
+	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
+	HealthBar->SetupAttachment(GetRootComponent());
 }
 
 void AEnemyCharacter::BeginPlay()
@@ -25,7 +30,31 @@ void AEnemyCharacter::BeginPlay()
 	//Outline
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED_OUTLINE);
 	//Abilitysystem Initialization
-	Cast<UBorisAbilitySystemComponent>(GetAbilitySystemComponent())->InitActorInfo(this, this);
+	GetAbilitySystemComponent()->InitActorInfo(this, this);
+
+	if (UBorisUserWidget* BorisUserWidget = Cast<UBorisUserWidget>(HealthBar->GetUserWidgetObject()))
+	{
+		BorisUserWidget->SetWidgetController(this);
+	}
+
+	if (const UBorisAttributeSet* BorisAS = Cast<UBorisAttributeSet>(AttributeSet))
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BorisAS->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			}
+		);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BorisAS->GetMaxHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			}
+		);
+
+		OnHealthChanged.Broadcast(BorisAS->GetHealth());
+		OnMaxHealthChanged.Broadcast(BorisAS->GetMaxHealth());
+	}
 }
 
 void AEnemyCharacter::HighlightActor()

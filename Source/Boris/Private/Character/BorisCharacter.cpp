@@ -8,6 +8,10 @@
 #include "Player/BorisPlayerState.h"
 #include "Player/BorisPlayerController.h"
 #include "UI/HUD/BorisHUD.h"
+#include "Components/BoxComponent.h"
+
+//TODO: Erase after implementing Damage properly
+#include "AbilitySystemBlueprintLibrary.h"
 
 ABorisCharacter::ABorisCharacter()
 {
@@ -29,6 +33,9 @@ void ABorisCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 
 	AddCharacterAbilities();
+
+	DeactivateWeaponCollider();
+
 }
 
 void ABorisCharacter::OnRep_PlayerState()
@@ -56,4 +63,18 @@ void ABorisCharacter::InitAbilityActorInfo()
 			BorisHUD->InitOverlay(BorisPlayerController, BorisPlayerState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+
+	InitializePrimaryAttributes();
+}
+
+void ABorisCharacter::ApplyDamage(AActor* OverlapingActor)
+{
+	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DamageEffectClass, 0, AbilitySystemComponent->MakeEffectContext());
+
+
+	if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OverlapingActor))
+	{
+		TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	}
+
 }

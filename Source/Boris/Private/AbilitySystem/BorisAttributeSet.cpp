@@ -21,17 +21,10 @@ void UBorisAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-}
-
-void UBorisAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Health, OldHealth)
-}
-
-void UBorisAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, MaxHealth, OldMaxHealth)
-
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Strength, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Vitality, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Dexterity, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Wisdom, COND_None, REPNOTIFY_Always);
 }
 
 void UBorisAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
@@ -88,6 +81,39 @@ void UBorisAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-	}
+	}	
+}
 
+//Vitality Attributes
+
+void UBorisAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Health, OldHealth)
+}
+
+void UBorisAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, MaxHealth, OldMaxHealth)
+}
+
+//Primary Attributes
+
+void UBorisAttributeSet::OnRep_Strength(const FGameplayAttributeData& OldStrength) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Strength, OldStrength);
+}
+
+void UBorisAttributeSet::OnRep_Vitality(const FGameplayAttributeData& OldIntelligence) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Vitality, OldIntelligence);
+}
+
+void UBorisAttributeSet::OnRep_Dexterity(const FGameplayAttributeData& OldResilience) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Dexterity, OldResilience);
+}
+
+void UBorisAttributeSet::OnRep_Wisdom(const FGameplayAttributeData& OldVigor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Wisdom, OldVigor);
 }

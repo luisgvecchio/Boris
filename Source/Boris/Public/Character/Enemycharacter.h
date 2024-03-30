@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "Character/CharacterBase.h"
 #include "Interaction/EnemyInterface.h"
+#include "UI/WidgetController/OverlayWidgetController.h"
 #include "EnemyCharacter.generated.h"
 
+
+class UWidgetComponent;
 /**
  * 
  */
@@ -23,4 +26,13 @@ public:
 	// Inherited via IEnemyInterface
 	void HighlightActor() override;
 	void UnHighlightActor() override;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChangedSignature OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChangedSignature OnMaxHealthChanged;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UWidgetComponent> HealthBar;
 };
