@@ -64,8 +64,9 @@ void ABorisCharacter::InitAbilityActorInfo()
 		}
 	}
 
-	InitializePrimaryAttributes();
+	InitializeDefaultAttributes();
 }
+
 
 void ABorisCharacter::ApplyDamage(AActor* OverlapingActor)
 {
@@ -76,5 +77,11 @@ void ABorisCharacter::ApplyDamage(AActor* OverlapingActor)
 	{
 		TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
+}
 
+int32 ABorisCharacter::GetPlayerLevel()
+{
+	const ABorisPlayerState* BorisPlayerState = GetPlayerState<ABorisPlayerState>();
+	check(BorisPlayerState);
+	return BorisPlayerState->GetPlayerLevel();
 }

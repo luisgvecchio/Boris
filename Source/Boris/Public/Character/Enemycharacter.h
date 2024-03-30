@@ -6,6 +6,7 @@
 #include "Character/CharacterBase.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "Data/CharacterClassInfo.h"
 #include "EnemyCharacter.generated.h"
 
 
@@ -21,11 +22,25 @@ class BORIS_API AEnemyCharacter : public ACharacterBase, public IEnemyInterface
 public:
 	AEnemyCharacter();
 
-	virtual void BeginPlay() override;
-
 	// Inherited via IEnemyInterface
 	void HighlightActor() override;
 	void UnHighlightActor() override;
+
+	/** Combat Interface */
+	virtual int32 GetPlayerLevel() override;
+	/** end Combat Interface */
+
+protected:
+
+	virtual void BeginPlay() override;
+
+	virtual void InitializeDefaultAttributes() const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	int32 Level = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChanged;

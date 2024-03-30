@@ -5,6 +5,7 @@
 #include "Components/WidgetComponent.h"
 #include "Boris/Boris.h"
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
+#include "AbilitySystem/BorisBlueprintFunctionLibrary.h"
 #include "AbilitySystem/BorisAttributeSet.h"
 #include "UI/Widgets/BorisUserWidget.h"
 
@@ -29,8 +30,12 @@ void AEnemyCharacter::BeginPlay()
 
 	//Outline
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED_OUTLINE);
+
 	//Abilitysystem Initialization
 	GetAbilitySystemComponent()->InitActorInfo(this, this);
+
+	//AttributesInitialization
+	InitializeDefaultAttributes();
 
 	if (UBorisUserWidget* BorisUserWidget = Cast<UBorisUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -67,4 +72,14 @@ void AEnemyCharacter::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
 	Weapon->SetRenderCustomDepth(false);
+}
+
+void AEnemyCharacter::InitializeDefaultAttributes() const
+{
+	UBorisAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+}
+
+int32 AEnemyCharacter::GetPlayerLevel()
+{
+	return Level;
 }

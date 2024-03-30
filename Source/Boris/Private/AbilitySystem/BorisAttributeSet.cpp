@@ -11,20 +11,35 @@
 
 UBorisAttributeSet::UBorisAttributeSet()
 {
-	InitHealth(50.f);
-	InitMaxHealth(100.f);
 }
 
 void UBorisAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	//Vital Atributtes
+
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+
+	//PrimaryAttributes
+
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Strength, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Vitality, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Dexterity, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Wisdom, COND_None, REPNOTIFY_Always);
+
+	// Secondary Attributes
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Accuracy, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, AttackCooldownRecovery, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, AttackSpeed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, CriticalHitChance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, CriticalHitDamage, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Endurance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MovementSpeed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 }
 
 void UBorisAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
@@ -81,7 +96,7 @@ void UBorisAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-	}	
+	}
 }
 
 //Vitality Attributes
@@ -91,10 +106,6 @@ void UBorisAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) c
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Health, OldHealth)
 }
 
-void UBorisAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, MaxHealth, OldMaxHealth)
-}
 
 //Primary Attributes
 
@@ -116,4 +127,56 @@ void UBorisAttributeSet::OnRep_Dexterity(const FGameplayAttributeData& OldResili
 void UBorisAttributeSet::OnRep_Wisdom(const FGameplayAttributeData& OldVigor) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Wisdom, OldVigor);
+}
+
+//Secondary Attributes
+
+void UBorisAttributeSet::OnRep_Accuracy(const FGameplayAttributeData& OldAccuracy) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Accuracy, OldAccuracy);
+}
+
+void UBorisAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Armor, OldArmor);
+}
+
+void UBorisAttributeSet::OnRep_AttackCooldownRecovery(const FGameplayAttributeData& OldAttackCooldownRecovery) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, AttackCooldownRecovery, OldAttackCooldownRecovery);
+}
+
+void UBorisAttributeSet::OnRep_AttackSpeed(const FGameplayAttributeData& OldAttackSpeed) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, AttackSpeed, OldAttackSpeed);
+}
+
+void UBorisAttributeSet::OnRep_CriticalHitChance(const FGameplayAttributeData& OldCriticalHitChance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, CriticalHitChance, CriticalHitChance);
+}
+
+void UBorisAttributeSet::OnRep_CriticalHitDamage(const FGameplayAttributeData& OldCriticalHitDamage) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, CriticalHitDamage, OldCriticalHitDamage);
+}
+
+void UBorisAttributeSet::OnRep_Endurance(const FGameplayAttributeData& OldEndurance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Endurance, OldEndurance);
+}
+
+void UBorisAttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, MovementSpeed, OldMovementSpeed);
+}
+
+void UBorisAttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStamina) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Stamina, OldStamina);
+}
+
+void UBorisAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, MaxHealth, OldMaxHealth)
 }

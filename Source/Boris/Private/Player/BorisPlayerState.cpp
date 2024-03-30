@@ -5,6 +5,7 @@
 #include "Boris/Boris.h"
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
 #include "AbilitySystem/BorisAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
 ABorisPlayerState::ABorisPlayerState()
 {
@@ -17,7 +18,19 @@ ABorisPlayerState::ABorisPlayerState()
 	AttributeSet = CreateDefaultSubobject<UBorisAttributeSet>("AttributeSet");
 }
 
+void ABorisPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ABorisPlayerState, Level);
+}
+
 UBorisAbilitySystemComponent* ABorisPlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void ABorisPlayerState::OnRep_Level(int32 OldLevel)
+{
+
 }
