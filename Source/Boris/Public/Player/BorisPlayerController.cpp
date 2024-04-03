@@ -35,12 +35,12 @@ void ABorisPlayerController::CursorTrace()
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 
 	if (!CursorHit.bBlockingHit)
-		return; 
+		return;
 
 	LastActor = CurrentActor;
 
 	CurrentActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-		
+
 	if (LastActor != CurrentActor)
 	{
 		if (LastActor) LastActor->UnHighlightActor();
@@ -50,7 +50,9 @@ void ABorisPlayerController::CursorTrace()
 
 void ABorisPlayerController::AutoRun()
 {
-	if (!bAutoRunning) return;
+	if (!bAutoRunning) 
+		return;
+
 	if (APawn* ControlledPawn = GetPawn())
 	{
 		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
@@ -67,7 +69,6 @@ void ABorisPlayerController::AutoRun()
 
 void ABorisPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	//GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
 	if (InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB))
 	{
 		bTargeting = CurrentActor ? true : false;
@@ -77,7 +78,6 @@ void ABorisPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void ABorisPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	//GEngine->AddOnScreenDebugMessage(2, 3.f, FColor::Blue, *InputTag.ToString());
 	if (!InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC())
@@ -86,15 +86,12 @@ void ABorisPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		}
 		return;
 	}
-
-	if (bTargeting)
+	if (GetASC())
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
+		GetASC()->AbilityInputTagReleased(InputTag);
 	}
-	else
+
+	if (!bTargeting && !bShiftKeyDown)
 	{
 		const APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressThreshold && ControlledPawn)
@@ -118,7 +115,6 @@ void ABorisPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void ABorisPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	//GEngine->AddOnScreenDebugMessage(3, 3.f, FColor::Green, *InputTag.ToString());
 	if (!InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC())
@@ -128,7 +124,7 @@ void ABorisPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC())
 		{
@@ -187,6 +183,8 @@ void ABorisPlayerController::SetupInputComponent()
 
 	//BorisInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ABorisPlayerController::Move);
 	BorisInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
+	BorisInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &ABorisPlayerController::ShiftPressed);
+	BorisInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &ABorisPlayerController::ShiftReleased);
 }
 
 void ABorisPlayerController::Move(const FInputActionValue& InputActionValue)
