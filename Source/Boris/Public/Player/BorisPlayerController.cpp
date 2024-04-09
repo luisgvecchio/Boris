@@ -12,6 +12,10 @@
 #include "Input/BorisInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 
+//TODO: Erese when: Find a better place for each ability to be activated or not depending on wheter the character has a weapon equipped etc.
+
+#include "Character/BorisCharacter.h"
+
 
 ABorisPlayerController::ABorisPlayerController()
 {
@@ -78,15 +82,19 @@ void ABorisPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void ABorisPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if (!InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB))
+	if (!InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB) &&
+		//TODO: Find a better place for each ability to be activated or not depending on wheter the character has a weapon equipped etc.
+		Cast<ABorisCharacter>(GetASC()->GetAvatarActor())->GetCharacterState() == ECharacterState::ECS_EquippedWithWeapon)
 	{
-		if (GetASC())
+		if (GetASC()) 
 		{
 			GetASC()->AbilityInputTagReleased(InputTag);
 		}
 		return;
 	}
-	if (GetASC())
+	if (GetASC() &&
+		//TODO: Find a better place for each ability to be activated or not depending on wheter the character has a weapon equipped etc.
+		Cast<ABorisCharacter>(GetASC()->GetAvatarActor())->GetCharacterState() == ECharacterState::ECS_EquippedWithWeapon)
 	{
 		GetASC()->AbilityInputTagReleased(InputTag);
 	}
@@ -115,7 +123,9 @@ void ABorisPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void ABorisPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if (!InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB))
+	if (!InputTag.MatchesTagExact(FBorisGameplayTags::Get().InputTag_LMB) &&
+		//TODO: Find a better place for each ability to be activated or not depending on wheter the character has a weapon equipped etc.
+		Cast<ABorisCharacter>(GetASC()->GetAvatarActor())->GetCharacterState() == ECharacterState::ECS_EquippedWithWeapon)
 	{
 		if (GetASC())
 		{
@@ -124,7 +134,9 @@ void ABorisPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting || bShiftKeyDown)
+	if (bTargeting || bShiftKeyDown &&
+		//TODO: Find a better place for each ability to be activated or not depending on wheter the character has a weapon equipped etc.
+		Cast<ABorisCharacter>(GetASC()->GetAvatarActor())->GetCharacterState() == ECharacterState::ECS_EquippedWithWeapon)
 	{
 		if (GetASC())
 		{
