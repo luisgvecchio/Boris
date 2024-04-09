@@ -65,13 +65,21 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::HighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(true);
-	Weapon->SetRenderCustomDepth(true);
+
+	if (!WeaponMesh)
+		return;
+
+	WeaponMesh->SetRenderCustomDepth(true);
 }
 
 void AEnemyCharacter::UnHighlightActor()
 {
 	GetMesh()->SetRenderCustomDepth(false);
-	Weapon->SetRenderCustomDepth(false);
+
+	if (!WeaponMesh)
+		return;
+
+	WeaponMesh->SetRenderCustomDepth(false);
 }
 
 void AEnemyCharacter::InitializeDefaultAttributes() const

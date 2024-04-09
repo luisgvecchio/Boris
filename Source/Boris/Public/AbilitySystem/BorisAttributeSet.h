@@ -130,6 +130,12 @@ public:
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const;
 
+	//Meta Attributes
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UBorisAttributeSet, IncomingDamage);
+
 	//Primary Attributes
 
 	UFUNCTION()

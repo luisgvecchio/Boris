@@ -9,9 +9,9 @@
 #include "Player/BorisPlayerController.h"
 #include "UI/HUD/BorisHUD.h"
 #include "Components/BoxComponent.h"
+#include "Actor/Items/Weapons/WeaponBase.h"
 
-//TODO: Erase after implementing Damage properly
-#include "AbilitySystemBlueprintLibrary.h"
+
 
 ABorisCharacter::ABorisCharacter()
 {
@@ -34,7 +34,7 @@ void ABorisCharacter::PossessedBy(AController* NewController)
 
 	AddCharacterAbilities();
 
-	DeactivateWeaponCollider();
+	//DeactivateWeaponCollider();
 
 }
 
@@ -67,15 +67,19 @@ void ABorisCharacter::InitAbilityActorInfo()
 	InitializeDefaultAttributes();
 }
 
-
-void ABorisCharacter::ApplyDamage(AActor* OverlapingActor)
+void ABorisCharacter::EquipWeapon(AWeaponBase* Weapon)
 {
-	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DamageEffectClass, 0, AbilitySystemComponent->MakeEffectContext());
+	Weapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this);
+	EquippedWeapon = Weapon;
 
+	CharacterState = ECharacterState::ECS_EquippedWithWeapon;
+}
 
-	if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OverlapingActor))
+void ABorisCharacter::AttachWeaponToHand()
+{
+	if (EquippedWeapon)
 	{
-		TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("WeaponHandSocket"));
 	}
 }
 

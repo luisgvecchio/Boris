@@ -39,7 +39,7 @@ void UBorisMeleeAttack::FinishCombo()
 	ABorisCharacter* BorisCharacter = Cast<ABorisCharacter>(GetAvatarActorFromActorInfo());
 
 	if (!BorisCharacter)
-		return;
+		return;	
 
 	BorisCharacter->DeactivateWeaponCollider();
 }

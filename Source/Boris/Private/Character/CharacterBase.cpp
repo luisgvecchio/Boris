@@ -3,21 +3,23 @@
 
 #include "Character/CharacterBase.h"
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
+#include "Actor/Items/Weapons/WeaponBase.h"
 #include "Components/BoxComponent.h"
 
-//TODO: Erase after debugging
+
+//TODO: Erase after not needing debugging
 #include "Kismet/KismetSystemLibrary.h"
 
 ACharacterBase::ACharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
-	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
-	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	EquippedWeapon = CreateDefaultSubobject<AWeaponBase>("Weapon");
 
-	WeaponBoxCollider = CreateDefaultSubobject<UBoxComponent>("WeaponBoxCollider");
-	WeaponBoxCollider->AttachToComponent(Weapon, FAttachmentTransformRules::KeepRelativeTransform);
+	if (!EquippedWeapon)
+		return;
+
+	EquippedWeapon->GetMesh()->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
 }
 
 UBorisAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
@@ -57,8 +59,9 @@ void ACharacterBase::AddCharacterAbilities()
 
 FVector ACharacterBase::GetCombatSocketLocation()
 {
-	check(Weapon);
-	return Weapon->GetSocketLocation(WeaponTipSocketName);
+	check(EquippedWeapon->GetMesh());
+
+	return EquippedWeapon->GetMesh()->GetSocketLocation(WeaponTipSocketName);
 }
 
 int32 ACharacterBase::GetPlayerLevel()
@@ -68,17 +71,17 @@ int32 ACharacterBase::GetPlayerLevel()
 
 void ACharacterBase::ActivateWeaponCollider()
 {
-	if (!WeaponBoxCollider)
+	if (!EquippedWeapon->GetWeaponBoxCollider())
 		return;
 
-	WeaponBoxCollider->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	EquippedWeapon->GetWeaponBoxCollider()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 void ACharacterBase::DeactivateWeaponCollider()
 {
-	if (!WeaponBoxCollider)
+	if (!EquippedWeapon->GetWeaponBoxCollider())
 		return;
 
-	WeaponBoxCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	EquippedWeapon->GetWeaponBoxCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 

@@ -14,6 +14,25 @@ class UAttributeSet;
 class UGameplayEffect;
 class UGameplayAbility;
 class UBoxComponent;
+class AWeaponBase;
+
+UENUM(BlueprintType)
+enum class ECharacterActionState : uint8
+{
+	EAS_Unoccupied UMETA(DisplayName = "Unoccupied"),
+	EAS_HitReaction UMETA(DisplayName = "HitReaction"),
+	EAS_Attacking UMETA(DisplayName = "Attacking"),
+	EAS_EquippingWeapon UMETA(DisplayName = "Equipping Weapon"),
+	EAS_Dodge UMETA(DisplayName = "Dodge"),
+	EAS_Dead UMETA(DisplayName = "Dead")
+};
+
+UENUM(BlueprintType)
+enum class ECharacterState : uint8
+{
+	ECS_Unequipped UMETA(DisplayName = "Unequipped"),
+	ECS_EquippedWithWeapon UMETA(DisplayName = "Equipped with Weapon")
+};
 
 UCLASS()
 class BORIS_API ACharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -29,13 +48,13 @@ public:
 	virtual UBorisAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }	
 
+	FORCEINLINE virtual ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE virtual ECharacterActionState GetActionState() const { return ActionState; }
+
 protected:
 
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TObjectPtr<USkeletalMeshComponent> Weapon;
-
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TObjectPtr<UBoxComponent> WeaponBoxCollider;
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	AWeaponBase* EquippedWeapon = nullptr;	
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
@@ -68,6 +87,11 @@ protected:
 	void AddCharacterAbilities();
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 	virtual void InitializeDefaultAttributes() const;
+
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	ECharacterActionState ActionState = ECharacterActionState::EAS_Unoccupied;
 
 private:
 

@@ -36,6 +36,9 @@ protected:
 
 	virtual void InitializeDefaultAttributes() const override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* WeaponMesh;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
 	int32 Level = 1;
 

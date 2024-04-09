@@ -6,8 +6,8 @@
 #include "Character/CharacterBase.h"
 #include "BorisCharacter.generated.h"
 
-//TODO: Erase after implementing Damage properly
-class UGameplayEffect;
+class AWeaponBase;
+
 /**
  * 
  */
@@ -18,9 +18,6 @@ class BORIS_API ABorisCharacter : public ACharacterBase
 	
 public:
 
-	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	FGameplayEffectSpecHandle DamageEffectSpecHandle;
-
 	ABorisCharacter();
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
@@ -29,15 +26,18 @@ public:
 	virtual int32 GetPlayerLevel() override;
 	/** end Combat Interface */
 
-protected:
 
-	//TODO: Remove when applying damage properly
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
-	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void ApplyDamage(AActor* OverlapingActor);
+	//FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	//TODO: Manage Action State// FORCEINLINE EActionState GetActionState() const { return ActionState; }
+
+	void EquipWeapon(AWeaponBase* Weapon);
+
+protected:	
+
+	UFUNCTION(BlueprintCallable)
+	void AttachWeaponToHand();
 
 private:
 
-	void InitAbilityActorInfo();
+	void InitAbilityActorInfo();	
 };

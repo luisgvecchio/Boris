@@ -4,7 +4,6 @@
 #include "AbilitySystem/BorisGameplayAbility.h"
 #include "BorisGameplayTags.h"
 
-
 void UBorisAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
