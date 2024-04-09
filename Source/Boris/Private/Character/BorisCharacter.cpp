@@ -75,6 +75,14 @@ void ABorisCharacter::EquipWeapon(AWeaponBase* Weapon)
 	CharacterState = ECharacterState::ECS_EquippedWithWeapon;
 }
 
+void ABorisCharacter::SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHandle IncomingAbilitySpecHandle)
+{
+	if (CharacterState != ECharacterState::ECS_EquippedWithWeapon)
+		return;
+
+	EquippedWeapon->DamageSpecHandle = IncomingAbilitySpecHandle;
+}
+
 void ABorisCharacter::AttachWeaponToHand()
 {
 	if (EquippedWeapon)
@@ -82,6 +90,7 @@ void ABorisCharacter::AttachWeaponToHand()
 		EquippedWeapon->AttachMeshToSocket(GetMesh(), FName("WeaponHandSocket"));
 	}
 }
+
 
 int32 ABorisCharacter::GetPlayerLevel()
 {

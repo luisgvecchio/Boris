@@ -52,17 +52,13 @@ protected:
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	virtual void ApplyDamage(AActor* OverlapingActor, TSubclassOf<UGameplayEffect> TargetDamageEffectClass);
+	virtual void ApplyDamage(AActor* OverlapingActor);
 
 
 	UFUNCTION()
 	void OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	TObjectPtr<ABorisCharacter> CharacterOwner;
-
-	//TODO: Remove when applying damage properly
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
 private:
 

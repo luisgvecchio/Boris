@@ -8,11 +8,7 @@
 #include "Components/BoxComponent.h"
 #include "Character/BorisCharacter.h"
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
-#include "BorisGameplayTags.h"
-
-//TODO: Erase after implementing Damage properly
 #include "AbilitySystemBlueprintLibrary.h"
-#include "Character/EnemyCharacter.h"
 
 AWeaponBase::AWeaponBase()
 {
@@ -37,7 +33,6 @@ void AWeaponBase::BeginPlay()
 	Super::BeginPlay();
 
 	WeaponBoxCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponBase::OnBoxOverlap);
-
 }
 
 void AWeaponBase::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator)
@@ -64,21 +59,14 @@ void AWeaponBase::AttachMeshToSocket(USceneComponent* InParent, const FName& InS
 	ItemMesh->AttachToComponent(InParent, TransformRules, InSocketName);
 }
 
-void AWeaponBase::ApplyDamage(AActor* OverlapingActor, TSubclassOf<UGameplayEffect> TargetDamageEffectClass)
+void AWeaponBase::ApplyDamage(AActor* OverlapingActor)
 {
-	UBorisAbilitySystemComponent* ABS = GetCharacterOwner()->GetAbilitySystemComponent();
-
-	FGameplayEffectSpecHandle SpecHandle = ABS->MakeOutgoingSpec(TargetDamageEffectClass, 0, ABS->MakeEffectContext());
-
-	FBorisGameplayTags GameplayTags = FBorisGameplayTags::Get();
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, 50.f);
-
 	if (!HasAuthority())
 		return;
 
 	if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OverlapingActor))
 	{
-		TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		TargetASC->ApplyGameplayEffectSpecToSelf(*DamageSpecHandle.Data.Get());
 	}
 }
 
@@ -100,9 +88,6 @@ void AWeaponBase::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, A
 
 void AWeaponBase::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!Cast<AEnemyCharacter>(OtherActor))
-		return;
-
 	const FVector Start = BoxTraceStart->GetComponentLocation();
 	const FVector End = BoxTraceEnd->GetComponentLocation();
 
@@ -122,7 +107,7 @@ void AWeaponBase::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		BoxHit,
 		true);
 
-	ApplyDamage(OtherActor, DamageEffectClass);
+	ApplyDamage(OtherActor);
 
 	for (AActor* Actor : IgnoreActors)
 	{

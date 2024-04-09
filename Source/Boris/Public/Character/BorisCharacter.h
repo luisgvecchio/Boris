@@ -32,6 +32,8 @@ public:
 
 	void EquipWeapon(AWeaponBase* Weapon);
 
+	void SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHandle IncomingAbilitySpecHandle);
+
 protected:	
 
 	UFUNCTION(BlueprintCallable)
