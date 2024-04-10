@@ -15,6 +15,7 @@ class UGameplayEffect;
 class UGameplayAbility;
 class UBoxComponent;
 class AWeaponBase;
+class UAnimMontage;
 
 UENUM(BlueprintType)
 enum class ECharacterActionState : uint8
@@ -50,6 +51,12 @@ public:
 
 	FORCEINLINE virtual ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE virtual ECharacterActionState GetActionState() const { return ActionState; }
+
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+	virtual void Die() override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
 
 protected:
 
@@ -97,4 +104,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };

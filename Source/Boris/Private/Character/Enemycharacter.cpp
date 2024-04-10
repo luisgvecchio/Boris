@@ -8,6 +8,8 @@
 #include "AbilitySystem/BorisBlueprintFunctionLibrary.h"
 #include "AbilitySystem/BorisAttributeSet.h"
 #include "UI/Widgets/BorisUserWidget.h"
+#include "BorisGameplayTags.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 AEnemyCharacter::AEnemyCharacter()
@@ -28,6 +30,8 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+
 	//Outline
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED_OUTLINE);
 
@@ -44,22 +48,50 @@ void AEnemyCharacter::BeginPlay()
 
 	if (const UBorisAttributeSet* BorisAS = Cast<UBorisAttributeSet>(AttributeSet))
 	{
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BorisAS->GetHealthAttribute()).AddLambda(
+		AddLambdaListenerToAttributeChange(OnHealthChanged, BorisAS->GetHealthAttribute());
+		AddLambdaListenerToAttributeChange(OnMaxHealthChanged, BorisAS->GetMaxHealthAttribute());
+
+		/*AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BorisAS->GetHealthAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
 				OnHealthChanged.Broadcast(Data.NewValue);
 			}
-		);
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BorisAS->GetMaxHealthAttribute()).AddLambda(
+		);*/
+		/*AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BorisAS->GetMaxHealthAttribute()).AddLambda(
 			[this](const FOnAttributeChangeData& Data)
 			{
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
-		);
+		);*/
+
+		ListenToHitReactTagChange();
 
 		OnHealthChanged.Broadcast(BorisAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(BorisAS->GetMaxHealth());
 	}
+}
+void AEnemyCharacter::AddLambdaListenerToAttributeChange(FOnAttributeChangedSignature& TargetAttributeChangeSignature,FGameplayAttribute EventToListenTo)
+{
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(EventToListenTo).AddLambda(
+		[&](const FOnAttributeChangeData& Data)
+		{
+			TargetAttributeChangeSignature.Broadcast(Data.NewValue);
+		}
+	);
+}
+
+void AEnemyCharacter::ListenToHitReactTagChange()
+{
+	AbilitySystemComponent->RegisterGameplayTagEvent(FBorisGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(
+		this,
+		&AEnemyCharacter::HitReactTagChanged
+	);
+}
+
+void AEnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
 }
 
 void AEnemyCharacter::HighlightActor()
@@ -90,4 +122,10 @@ void AEnemyCharacter::InitializeDefaultAttributes() const
 int32 AEnemyCharacter::GetPlayerLevel()
 {
 	return Level;
+}
+
+void AEnemyCharacter::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
 }

@@ -5,6 +5,7 @@
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
 #include "Actor/Items/Weapons/WeaponBase.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 
 
 //TODO: Erase after not needing debugging
@@ -25,6 +26,11 @@ ACharacterBase::ACharacterBase()
 UBorisAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+UAnimMontage* ACharacterBase::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage;
 }
 
 void ACharacterBase::BeginPlay()
@@ -83,5 +89,35 @@ void ACharacterBase::DeactivateWeaponCollider()
 		return;
 
 	EquippedWeapon->GetWeaponBoxCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ACharacterBase::Die()
+{
+	EquippedWeapon->GetMesh()->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	MulticastHandleDeath();
+}
+
+/// <summary>
+/// Happens in both Server and Clients
+/// </summary>
+void ACharacterBase::MulticastHandleDeath_Implementation()
+{
+	auto WeaponMesh = EquippedWeapon->GetMesh();
+
+	if (WeaponMesh)
+	{
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
+
+	auto CharacterMesh = GetMesh();
+
+	CharacterMesh->SetSimulatePhysics(true);
+	CharacterMesh->SetEnableGravity(true);
+	CharacterMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	CharacterMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
