@@ -99,7 +99,7 @@ void UBorisAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
-		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+		SetHealth((int)round(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth())));
 	}
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
@@ -107,7 +107,9 @@ void UBorisAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 		SetIncomingDamage(0.f);
 		if (LocalIncomingDamage > 0.f)
 		{
-			const float NewHealth = GetHealth() - LocalIncomingDamage;
+			const float NewHealth = GetHealth() - (int)round(LocalIncomingDamage);
+
+
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
 			const bool bFatal = NewHealth <= 0.f;

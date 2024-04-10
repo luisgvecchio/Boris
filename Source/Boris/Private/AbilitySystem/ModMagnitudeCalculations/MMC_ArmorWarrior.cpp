@@ -1,21 +1,20 @@
 // Copyright Three Headed Monkey Studios
 
 
-#include "AbilitySystem/ModMagnitudeCalculations/MMC_MaxHealth.h"
+#include "AbilitySystem/ModMagnitudeCalculations/MMC_ArmorWarrior.h"
 
 #include "AbilitySystem/BorisAttributeSet.h"
 #include "Interaction/CombatInterface.h"
 
-UMMC_MaxHealth::UMMC_MaxHealth()
+UMMC_ArmorWarrior::UMMC_ArmorWarrior()
 {
 	VitalityDefinition.AttributeToCapture = UBorisAttributeSet::GetVitalityAttribute();
 	VitalityDefinition.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
-	VitalityDefinition.bSnapshot = false;
 
 	RelevantAttributesToCapture.Add(VitalityDefinition);
 }
 
-float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
+float UMMC_ArmorWarrior::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
 	// Gather tags from source and target
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
@@ -35,9 +34,9 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	return CalculateResult(Vitality, PlayerLevel);
 }
 
-float UMMC_MaxHealth::CalculateResult(float Vitality, const int32& PlayerLevel) const
+float UMMC_ArmorWarrior::CalculateResult(float Vitality, const int32& PlayerLevel) const
 {
-	float result = 20.f + 2.f * Vitality + 5.f * PlayerLevel;
+	float result = 2.f * Vitality + 0.5 * PlayerLevel;
 
 	return (int)round(result);
 }

@@ -148,7 +148,7 @@ void ABorisPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting || bShiftKeyDown &&
+	if ((bTargeting || bShiftKeyDown) &&
 		//TODO: Find a better place for each ability to be activated or not depending on wheter the character has a weapon equipped etc.
 		Cast<ABorisCharacter>(GetASC()->GetAvatarActor())->GetCharacterState() == ECharacterState::ECS_EquippedWithWeapon)
 	{

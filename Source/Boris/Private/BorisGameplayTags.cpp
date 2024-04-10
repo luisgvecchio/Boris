@@ -62,7 +62,7 @@ void FBorisGameplayTags::InitializeNativeGameplayTags()
 
 	GameplayTags.Attributes_Secondary_CriticalHitDamage = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.CriticalHitDamage"),
-		FString("Damage multiplier for Critical Hits")
+		FString("Damage multiplier (percentage) for Critical Hits")
 	);
 
 	GameplayTags.Attributes_Secondary_Endurance = UGameplayTagsManager::Get().AddNativeGameplayTag(
