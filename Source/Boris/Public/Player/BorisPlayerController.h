@@ -6,13 +6,15 @@
 #include "GameplayTagContainer.h"
 #include "BorisPlayerController.generated.h"
 
+
 struct FInputActionValue;
 class UInputMappingContext;
 class UInputAction;
 class IEnemyInterface;
 class UBorisInputConfig;
 class UBorisAbilitySystemComponent;
-//class USplineComponent;
+class UDamageTextComponent;
+class USplineComponent;
 
 /**
  * 
@@ -25,6 +27,9 @@ class BORIS_API ABorisPlayerController : public APlayerController
 public:
 	ABorisPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
+
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
 
 protected:
 	virtual void BeginPlay() override;
@@ -76,5 +81,8 @@ private:
 		float AutoRunAcceptanceRadius = 50.f;
 
 		UPROPERTY(VisibleAnywhere)
-		TObjectPtr<class USplineComponent> Spline;
+		TObjectPtr<USplineComponent> Spline;
+
+		UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };

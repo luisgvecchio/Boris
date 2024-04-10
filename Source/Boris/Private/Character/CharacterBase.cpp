@@ -119,5 +119,28 @@ void ACharacterBase::MulticastHandleDeath_Implementation()
 	CharacterMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	UCapsuleComponent* HitCollider = Cast<UCapsuleComponent>(GetDefaultSubobjectByName(TEXT("HitCollider")));
+
+	if(HitCollider)
+		HitCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	DissolveMaterials();
+}
+
+void ACharacterBase::DissolveMaterials()
+{
+	if (IsValid(DissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(DissolveMaterialInstance, this);
+		GetMesh()->SetMaterial(0, DynamicMatInst);
+		StartDissolveTimeline(DynamicMatInst);
+	}
+	if (IsValid(WeaponDissolveMaterialInstance))
+	{
+		UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(WeaponDissolveMaterialInstance, this);
+		EquippedWeapon->GetMesh()->SetMaterial(0, DynamicMatInst);
+		StartWeaponDissolveTimeline(DynamicMatInst);
+	}
 }
 
