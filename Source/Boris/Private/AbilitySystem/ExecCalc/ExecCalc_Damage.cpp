@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/ExecCalc/ExecCalc_Damage.h"
 
+#include "AbilitySystem/BorisBlueprintFunctionLibrary.h"
+#include "BorisAbilityTypes.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BorisAttributeSet.h"
 #include "BorisGameplayTags.h"
@@ -52,6 +54,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvaluationParameters.SourceTags = SourceTags;
 	EvaluationParameters.TargetTags = TargetTags;
 
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+
 	//Critical
 	float SourceCriticalHitChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitChanceDef, EvaluationParameters, SourceCriticalHitChance);
@@ -76,6 +80,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	{
 		float AddedDamagePercent = SourceCriticalHitDamage * 0.01;
 		float CriticalPercent = 2.f + AddedDamagePercent;
+
+		UBorisAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bCriticalHit);
 
 		Damage *= CriticalPercent;
 	}

@@ -4,6 +4,7 @@
 #include "AbilitySystem/BorisAttributeSet.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystem/BorisBlueprintFunctionLibrary.h"
 #include "GameFramework/Character.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
@@ -128,18 +129,22 @@ void UBorisAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 				TagContainer.AddTag(FBorisGameplayTags::Get().Effects_HitReact);
 				Props.TargetASC->TryActivateAbilitiesByTag(TagContainer);
 			}
-			ShowFloatingText(Props, LocalIncomingDamage);
+
+			const bool bBlock = UBorisAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+			const bool bCriticalHit = UBorisAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+
+			ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCriticalHit);
 		}
 	}
 }
 
-void UBorisAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage) const
+void UBorisAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const
 {
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
 		if (ABorisPlayerController* PC = Cast<ABorisPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
 		{
-			PC->ShowDamageNumber(Damage, Props.TargetCharacter);
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}
 	}
 }

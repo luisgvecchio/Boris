@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/BorisBlueprintFunctionLibrary.h"
 
+#include "BorisAbilityTypes.h"
 #include "Game/BorisGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/WidgetController/BorisWidgetController.h"
@@ -49,4 +50,39 @@ void UBorisAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* Worl
 	VitalAttributesContextHandle.AddSourceObject(AvatarActor);
 	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->VitalAttributes, Level, VitalAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
+}
+
+bool UBorisAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBorisGameplayEffectContext* BorisEffectContext = static_cast<const FBorisGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BorisEffectContext->IsBlockedHit();
+	}
+	return false;
+}
+
+bool UBorisAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBorisGameplayEffectContext* BorisEffectContext = static_cast<const FBorisGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BorisEffectContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void UBorisAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit)
+{
+	if (FBorisGameplayEffectContext* BorisEffectContext = static_cast<FBorisGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BorisEffectContext->SetIsBlockedHit(bInIsBlockedHit);
+	}
+}
+
+void UBorisAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle,
+	bool bInIsCriticalHit)
+{
+	if (FBorisGameplayEffectContext* BorisEffectContext = static_cast<FBorisGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BorisEffectContext->SetIsCriticalHit(bInIsCriticalHit);
+	}
 }
