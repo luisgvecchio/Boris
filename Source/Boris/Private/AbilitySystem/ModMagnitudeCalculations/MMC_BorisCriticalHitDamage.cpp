@@ -36,7 +36,7 @@ float UMMC_BorisCriticalHitDamage::CalculateBaseMagnitude_Implementation(const F
 
 float UMMC_BorisCriticalHitDamage::CalculateResult(float Dexterity, const int32& PlayerLevel) const
 {
-	float result = 3.f * Dexterity + 0.2 * PlayerLevel;
+	float result = 4.f * Dexterity + 0.2 * PlayerLevel;
 
 	return (int)round(result);
 }

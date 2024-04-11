@@ -70,7 +70,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	//Critical Calc. (2.f + SourceCriticalHitDamage * 0,01.f) Because SourceCriticalHitDamage is percentage.
 	//Double damage + whatever extra percentage the CriticalHitDamage provides
 
-	const bool bCriticalHit = FMath::RandRange(1, 100) < SourceCriticalHitChance;
+	const bool bCriticalHit = FMath::RandRange(1, 100) <= SourceCriticalHitChance;
 
 	if (bCriticalHit)
 	{
@@ -85,6 +85,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	Damage = FMath::Max<float>(0.f, Damage);
 	Damage = (int)round(Damage);
 
-	const FGameplayModifierEvaluatedData EvaluatedData(UBorisAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
+	const FGameplayModifierEvaluatedData EvaluatedData(UBorisAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Override, Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
 }

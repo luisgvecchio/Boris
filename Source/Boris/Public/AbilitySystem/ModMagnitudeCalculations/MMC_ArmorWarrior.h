@@ -15,6 +15,7 @@ class BORIS_API UMMC_ArmorWarrior : public UGameplayModMagnitudeCalculation
 	GENERATED_BODY()
 	
 public:
+
 	UMMC_ArmorWarrior();
 
 	virtual float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;

@@ -49,6 +49,8 @@ public:
 	virtual UBorisAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }	
 
+	virtual AWeaponBase* GetEquippedWeapon() const { return EquippedWeapon; }
+
 	FORCEINLINE virtual ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE virtual ECharacterActionState GetActionState() const { return ActionState; }
 

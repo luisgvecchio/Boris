@@ -7,6 +7,7 @@
 #include "Character/BorisCharacter.h"
 #include "BorisGameplayTags.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Actor/Items/Weapons/WeaponBase.h"
 
 
 //TODO: Erase After debugging
@@ -23,15 +24,19 @@ void UBorisMeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 void UBorisMeleeAttack::UpdateGameplayEffectForDamage()
 {
 	const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
+	ABorisCharacter* BorisCharacter = Cast<ABorisCharacter>(GetAvatarActorFromActorInfo());
 
-	FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, 0, SourceASC->MakeEffectContext());
+	FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+	EffectContextHandle.SetAbility(this);
+	EffectContextHandle.AddSourceObject(BorisCharacter->GetEquippedWeapon());
+
+	FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, 0, EffectContextHandle);
 
 	FBorisGameplayTags GameplayTags = FBorisGameplayTags::Get();
 
 	const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage, ScaledDamage);
 
-	ABorisCharacter* BorisCharacter = Cast<ABorisCharacter>(GetAvatarActorFromActorInfo());
 	BorisCharacter->SendAbilitySpecHandleToEquippedWeapon(SpecHandle);
 }
 

@@ -36,7 +36,7 @@ float UMMC_BorisCriticalChance::CalculateBaseMagnitude_Implementation(const FGam
 
 float UMMC_BorisCriticalChance::CalculateResult(float Wisdom, const int32& PlayerLevel) const
 {
-	float result = 2.f * Wisdom + 0.2 * PlayerLevel;
+	float result = 15.f * Wisdom + 0.2 * PlayerLevel;
 
 	return (int)round(result);
 }

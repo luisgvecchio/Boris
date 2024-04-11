@@ -107,6 +107,11 @@ void AWeaponBase::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		BoxHit,
 		true);
 
+	FGameplayEffectContextHandle ctx = DamageSpecHandle.Data.Get()->GetEffectContext();
+	ctx.AddHitResult(BoxHit);
+
+	DamageSpecHandle.Data.Get()->SetContext(ctx, true);
+
 	ApplyDamage(OtherActor);
 
 	for (AActor* Actor : IgnoreActors)
