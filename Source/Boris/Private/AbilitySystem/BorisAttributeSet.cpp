@@ -16,6 +16,29 @@
 
 UBorisAttributeSet::UBorisAttributeSet()
 {
+	const FBorisGameplayTags& GameplayTags = FBorisGameplayTags::Get();
+
+	//Primary Attributes
+	TagsToAttributes.Add(GameplayTags.Attributes_Primary_Strength, GetStrengthAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Primary_Vitality, GetVitalityAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Primary_Dexterity, GetDexterityAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Primary_Wisdom, GetWisdomAttribute);
+
+	//Secondary Attributes
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_Accuracy, GetAccuracyAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_Armor, GetArmorAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_AttackCooldownRecovery, GetAttackCooldownRecoveryAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_AttackSpeed, GetAttackSpeedAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_CriticalHitChance, GetCriticalHitChanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_CriticalHitDamage, GetCriticalHitDamageAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_Endurance, GetEnduranceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_MaxHealth, GetMaxHealthAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_MovementSpeed, GetMovementSpeedAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_Stamina, GetStaminaAttribute);
+
+	//Resistance Attributes
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Physical_Damage, GetPhysicalDamageResistanceAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Ranged_Damage, GetRangedDamageResistanceAttribute);	
 }
 
 void UBorisAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -45,6 +68,11 @@ void UBorisAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MovementSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+
+	//Resistance Attributes
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, PhysicalDamageResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, RangedDamageResistance, COND_None, REPNOTIFY_Always);
 }
 
 void UBorisAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
@@ -229,4 +257,16 @@ void UBorisAttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStamina)
 void UBorisAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, MaxHealth, OldMaxHealth)
+}
+
+// Resistances
+
+void UBorisAttributeSet::OnRep_PhysicalDamageResistance(const FGameplayAttributeData& OldPhysicalDamageResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, PhysicalDamageResistance, OldPhysicalDamageResistance);
+}
+
+void UBorisAttributeSet::OnRep_RangedDamageResistance(const FGameplayAttributeData& OldRangedDamageResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, RangedDamageResistance, OldRangedDamageResistance);
 }

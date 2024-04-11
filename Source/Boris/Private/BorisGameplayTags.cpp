@@ -87,7 +87,7 @@ void FBorisGameplayTags::InitializeNativeGameplayTags()
 
 	GameplayTags.Attributes_Secondary_Stamina = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.Stamina"),
-		FString("The amount of stamine determines how much can a player Run without getting tired")
+		FString("The amount of stamina determines how much can a player Run without getting tired")
 	);
 
 	/*
@@ -124,10 +124,33 @@ void FBorisGameplayTags::InitializeNativeGameplayTags()
 		FString("Input Tag for 4 key")
 	);
 
-	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Damage"),
-		FString("Damage")
+	//Damage Types
+
+	GameplayTags.Damage_Physical = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.PhysicalDamage"),
+		FString("Physica Damage")
 	);
+
+	GameplayTags.Damage_Ranged = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Damage.RangedDamage"),
+		FString("Ranged Damage")
+	);
+
+	//Resistances
+
+	GameplayTags.Attributes_Resistance_Physical_Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Resistance.Physical"),
+		FString("Resistance to Physical damage")
+	);
+	GameplayTags.Attributes_Resistance_Ranged_Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Resistance.Physical"),
+		FString("Resistance to Physical damage")
+	);
+
+	//Map of Damage Types to Resistances
+
+	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Physical, GameplayTags.Attributes_Resistance_Physical_Damage);
+	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Ranged, GameplayTags.Attributes_Resistance_Ranged_Damage);
 
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Effects.HitReact"),

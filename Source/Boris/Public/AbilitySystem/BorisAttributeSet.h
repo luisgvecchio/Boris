@@ -40,6 +40,10 @@ struct FEffectProperties
 	ACharacter* TargetCharacter = nullptr;
 };
 
+// typedef is specific to the FGameplayAttribute() signature, but TStaticFunPtr is generic to any signature chosen
+//typedef TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr FAttributeFuncPtr;
+template<class T>
+using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
 
 /**
  * 
@@ -57,6 +61,7 @@ public:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
+	TMap<FGameplayTag, TStaticFuncPtr<FGameplayAttribute()>> TagsToAttributes;
 
 	//Vital Atributes
 
@@ -123,12 +128,30 @@ public:
 	FGameplayAttributeData Stamina;
 	ATTRIBUTE_ACCESSORS(UBorisAttributeSet, Stamina);
 
+	//Resistance Attributes
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicalDamageResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData PhysicalDamageResistance;
+	ATTRIBUTE_ACCESSORS(UBorisAttributeSet, PhysicalDamageResistance);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_RangedDamageResistance, Category = "Resistance Attributes")
+	FGameplayAttributeData RangedDamageResistance;
+	ATTRIBUTE_ACCESSORS(UBorisAttributeSet, RangedDamageResistance);
+
 	//Vital Attributes
 
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const;
+
+	//Resistances
+
+	UFUNCTION()
+	void OnRep_PhysicalDamageResistance(const FGameplayAttributeData& OldPhysicalDamageResistance) const;
+	UFUNCTION()
+	void OnRep_RangedDamageResistance(const FGameplayAttributeData& OldRangedDamageResistance) const;
+
 
 	//Meta Attributes
 

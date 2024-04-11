@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/BorisGameplayAbility.h"
+#include "AbilitySystem/Abilities/BorisDamageGameplayAbility.h"
 #include "BorisMeleeAttack.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BORIS_API UBorisMeleeAttack : public UBorisGameplayAbility
+class BORIS_API UBorisMeleeAttack : public UBorisDamageGameplayAbility
 {
 	GENERATED_BODY()
 
@@ -27,8 +27,5 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	void FinishCombo();
-
-	UPROPERTY(EditDefaultsOnly, Category = "Combat")
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
 };

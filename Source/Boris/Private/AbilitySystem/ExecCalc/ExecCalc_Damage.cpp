@@ -15,12 +15,29 @@ struct BorisDamageStatics
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitChance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CriticalHitDamage);
 
+	DECLARE_ATTRIBUTE_CAPTUREDEF(PhysicalDamageResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(RangedDamageResistance);
+
+	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefs;
+
 	BorisDamageStatics()
 	{
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UBorisAttributeSet, Armor, Target, false);
-		
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBorisAttributeSet, Armor, Target, false);		
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBorisAttributeSet, CriticalHitChance, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBorisAttributeSet, CriticalHitDamage, Source, false);
+
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBorisAttributeSet, PhysicalDamageResistance, Source, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBorisAttributeSet, RangedDamageResistance, Source, false);
+
+		const FBorisGameplayTags& Tags = FBorisGameplayTags::Get();
+
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_Armor, ArmorDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CriticalHitChance, CriticalHitChanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CriticalHitDamage, CriticalHitDamageDef);
+
+		TagsToCaptureDefs.Add(Tags.Attributes_Resistance_Physical_Damage, PhysicalDamageResistanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Resistance_Ranged_Damage, RangedDamageResistanceDef);
+
 	}
 };
 
@@ -35,6 +52,11 @@ UExecCalc_Damage::UExecCalc_Damage()
 	RelevantAttributesToCapture.Add(DamageStatics().ArmorDef);
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitChanceDef);
 	RelevantAttributesToCapture.Add(DamageStatics().CriticalHitDamageDef);
+
+	RelevantAttributesToCapture.Add(DamageStatics().PhysicalDamageResistanceDef);
+	RelevantAttributesToCapture.Add(DamageStatics().RangedDamageResistanceDef);
+
+
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -65,7 +87,26 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().CriticalHitDamageDef, EvaluationParameters, SourceCriticalHitDamage);
 	SourceCriticalHitDamage = FMath::Max<float>(SourceCriticalHitDamage, 0.f);
 
-	float Damage = Spec.GetSetByCallerMagnitude(FBorisGameplayTags::Get().Damage);
+	float Damage = 0.f;
+
+	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : FBorisGameplayTags::Get().DamageTypesToResistances)
+	{
+		const FGameplayTag DamageTypeTag = Pair.Key;
+		const FGameplayTag ResistanceTag = Pair.Value;
+
+		checkf(BorisDamageStatics().TagsToCaptureDefs.Contains(ResistanceTag), TEXT("TagsToCaptureDefs doesn't contain Tag: [%s] in ExecCalc_Damage"), *ResistanceTag.ToString());
+		const FGameplayEffectAttributeCaptureDefinition CaptureDef = BorisDamageStatics().TagsToCaptureDefs[ResistanceTag];
+
+		float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key);
+
+		float Resistance = 0.f;
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvaluationParameters, Resistance);
+		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);
+
+		DamageTypeValue *= (100.f - Resistance) / 100.f;
+
+		Damage += DamageTypeValue;
+	}
 
 	float Armor = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().ArmorDef, EvaluationParameters, Armor);

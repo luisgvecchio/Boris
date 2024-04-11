@@ -34,14 +34,20 @@ public:
 	FGameplayTag Attributes_Secondary_MovementSpeed;
 	FGameplayTag Attributes_Secondary_Stamina;
 
+	FGameplayTag Attributes_Resistance_Physical_Damage;
+	FGameplayTag Attributes_Resistance_Ranged_Damage;
+
+	FGameplayTag Damage_Physical;
+	FGameplayTag Damage_Ranged;
+
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
+
 	FGameplayTag InputTag_LMB;
 	FGameplayTag InputTag_RMB;
 	FGameplayTag InputTag_1;
 	FGameplayTag InputTag_2;
 	FGameplayTag InputTag_3;
 	FGameplayTag InputTag_4;
-
-	FGameplayTag Damage;
 
 	FGameplayTag Effects_HitReact;
 
