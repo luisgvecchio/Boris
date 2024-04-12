@@ -17,6 +17,8 @@
 //TODO: Erese when: Find a better place for each ability to be activated or not depending on wheter the character has a weapon equipped etc.
 
 #include "Character/BorisCharacter.h"
+//TODO: Erase After debugging
+#include "Kismet/KismetSystemLibrary.h"
 
 
 ABorisPlayerController::ABorisPlayerController()
@@ -38,7 +40,7 @@ void ABorisPlayerController::PlayerTick(float DeltaTime)
 
 void ABorisPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
 {
-	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	if (IsValid(TargetCharacter) && DamageTextComponentClass && IsLocalController())
 	{
 		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
 		DamageText->RegisterComponent();

@@ -19,6 +19,13 @@ void UBorisMeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	UpdateGameplayEffectForDamage();
+
+	GEngine->AddOnScreenDebugMessage(
+		-1,        // don't over wrire previous message, add a new one
+		2.f,   // Duration of message - limits distance messages scroll onto screen
+		FColor::Green.WithAlpha(64),   // Color and transparancy!
+		FString::Printf(TEXT("        %s"), *GetAvatarActorFromActorInfo()->GetName())  // Our usual text message format
+	);
 }
 
 void UBorisMeleeAttack::UpdateGameplayEffectForDamage()
@@ -71,6 +78,8 @@ void UBorisMeleeAttack::FinishCombo()
 		return;	
 
 	BorisCharacter->DeactivateWeaponCollider();
+	BorisCharacter->GetEquippedWeapon()->ResetActorsToIgnore();
+
 }
 
 

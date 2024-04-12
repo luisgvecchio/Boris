@@ -9,6 +9,9 @@
 #include "AbilitySystem/BorisAttributeSet.h"
 #include "UI/Widgets/BorisUserWidget.h"
 #include "BorisGameplayTags.h"
+#include "AI/BorisAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -18,12 +21,29 @@ AEnemyCharacter::AEnemyCharacter()
 
 	AbilitySystemComponent = CreateDefaultSubobject<UBorisAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);	
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 
 	AttributeSet = CreateDefaultSubobject<UBorisAttributeSet>("AttributeSet");
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBar->SetupAttachment(GetRootComponent());
+}
+
+void AEnemyCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (!HasAuthority()) 
+		return;
+
+	BorisAIController = Cast<ABorisAIController>(NewController);
+	BorisAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	BorisAIController->RunBehaviorTree(BehaviorTree);
 }
 
 void AEnemyCharacter::BeginPlay()
@@ -32,7 +52,7 @@ void AEnemyCharacter::BeginPlay()
 
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 
-	//Outline
+	//Outline wehn under the mouse
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED_OUTLINE);
 
 	//Abilitysystem Initialization
@@ -51,26 +71,13 @@ void AEnemyCharacter::BeginPlay()
 		AddLambdaListenerToAttributeChange(OnHealthChanged, BorisAS->GetHealthAttribute());
 		AddLambdaListenerToAttributeChange(OnMaxHealthChanged, BorisAS->GetMaxHealthAttribute());
 
-		/*AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BorisAS->GetHealthAttribute()).AddLambda(
-			[this](const FOnAttributeChangeData& Data)
-			{
-				OnHealthChanged.Broadcast(Data.NewValue);
-			}
-		);*/
-		/*AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BorisAS->GetMaxHealthAttribute()).AddLambda(
-			[this](const FOnAttributeChangeData& Data)
-			{
-				OnMaxHealthChanged.Broadcast(Data.NewValue);
-			}
-		);*/
-
 		ListenToHitReactTagChange();
 
 		OnHealthChanged.Broadcast(BorisAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(BorisAS->GetMaxHealth());
 	}
 }
-void AEnemyCharacter::AddLambdaListenerToAttributeChange(FOnAttributeChangedSignature& TargetAttributeChangeSignature,FGameplayAttribute EventToListenTo)
+void AEnemyCharacter::AddLambdaListenerToAttributeChange(FOnAttributeChangedSignature& TargetAttributeChangeSignature, FGameplayAttribute EventToListenTo)
 {
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(EventToListenTo).AddLambda(
 		[&](const FOnAttributeChangeData& Data)
@@ -116,6 +123,9 @@ void AEnemyCharacter::UnHighlightActor()
 
 void AEnemyCharacter::InitializeDefaultAttributes() const
 {
+	if (!HasAuthority())
+		return;
+
 	UBorisAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }
 

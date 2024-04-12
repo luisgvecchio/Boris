@@ -34,8 +34,6 @@ void ABorisCharacter::PossessedBy(AController* NewController)
 
 	AddCharacterAbilities();
 
-	//DeactivateWeaponCollider();
-
 }
 
 void ABorisCharacter::OnRep_PlayerState()
@@ -70,6 +68,8 @@ void ABorisCharacter::InitAbilityActorInfo()
 void ABorisCharacter::EquipWeapon(AWeaponBase* Weapon)
 {
 	Weapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this);
+	DeactivateWeaponCollider();
+
 	EquippedWeapon = Weapon;
 
 	CharacterState = ECharacterState::ECS_EquippedWithWeapon;

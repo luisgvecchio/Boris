@@ -42,7 +42,8 @@ public:
 	ABorisCharacter* GetCharacterOwner() const { return CharacterOwner; }
 	void SetCharacterOwner(AActor* TargetCharacterOwner);
 
-	TArray<AActor*> IgnoreActors;		
+	void ResetActorsToIgnore();
+	TArray<AActor*> GetActorsToIgnore() const { return IgnoreActors; }
 
 protected:
 
@@ -60,6 +61,7 @@ protected:
 
 	TObjectPtr<ABorisCharacter> CharacterOwner;
 
+	TArray<AActor*> IgnoreActors;
 private:
 
 	UPROPERTY(VisibleAnywhere)

@@ -12,6 +12,9 @@
 
 class UWidgetComponent;
 class FOnAttributeChangedSignature;
+class UBehaviorTree;
+class ABorisAIController;
+
 /**
  * 
  */
@@ -22,6 +25,8 @@ class BORIS_API AEnemyCharacter : public ACharacterBase, public IEnemyInterface
 
 public:
 	AEnemyCharacter();
+
+	virtual void PossessedBy(AController* NewController) override;
 
 	// Inherited via IEnemyInterface
 	void HighlightActor() override;
@@ -67,6 +72,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<ABorisAIController> BorisAIController;
 
 	void AddLambdaListenerToAttributeChange(FOnAttributeChangedSignature& TargetAttributeChangeSignature, FGameplayAttribute EventToListenTo);
 	void ListenToHitReactTagChange();

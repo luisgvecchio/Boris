@@ -28,6 +28,11 @@ void AWeaponBase::SetCharacterOwner(AActor* TargetCharacterOwner)
 	CharacterOwner = Cast<ABorisCharacter>(TargetCharacterOwner);
 }
 
+void AWeaponBase::ResetActorsToIgnore()
+{
+	IgnoreActors.Reset();
+}
+
 void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -90,9 +95,8 @@ void AWeaponBase::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 {
 	const FVector Start = BoxTraceStart->GetComponentLocation();
 	const FVector End = BoxTraceEnd->GetComponentLocation();
-
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
+		
+	IgnoreActors.AddUnique(this);
 	FHitResult BoxHit;
 	UKismetSystemLibrary::BoxTraceSingle(
 		this,
@@ -102,20 +106,15 @@ void AWeaponBase::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		BoxTraceStart->GetComponentRotation(),
 		ETraceTypeQuery::TraceTypeQuery1,
 		false,
-		ActorsToIgnore,
+		IgnoreActors,
 		EDrawDebugTrace::None,
 		BoxHit,
 		true);
 
 	ApplyDamage(OtherActor);
 
-	for (AActor* Actor : IgnoreActors)
-	{
-		ActorsToIgnore.AddUnique(Actor);
-	}
-
 	if (BoxHit.GetActor())
 	{
 		IgnoreActors.AddUnique(BoxHit.GetActor());
-	}
+	}	
 }

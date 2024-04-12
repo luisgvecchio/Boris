@@ -170,7 +170,7 @@ void UBorisAttributeSet::ShowFloatingText(const FEffectProperties& Props, float 
 {
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
-		if (ABorisPlayerController* PC = Cast<ABorisPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+		if (ABorisPlayerController* PC = Cast<ABorisPlayerController>(Props.SourceCharacter->Controller))
 		{
 			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}
