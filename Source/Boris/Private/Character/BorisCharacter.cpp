@@ -68,9 +68,9 @@ void ABorisCharacter::InitAbilityActorInfo()
 void ABorisCharacter::EquipWeapon(AWeaponBase* Weapon)
 {
 	Weapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this);
-	DeactivateWeaponCollider();
 
 	EquippedWeapon = Weapon;
+	DeactivateWeaponCollider();
 
 	CharacterState = ECharacterState::ECS_EquippedWithWeapon;
 }
