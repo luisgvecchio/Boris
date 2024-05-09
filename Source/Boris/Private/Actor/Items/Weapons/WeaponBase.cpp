@@ -6,6 +6,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Character/BorisCharacter.h"
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -25,13 +26,15 @@ AWeaponBase::AWeaponBase()
 
 void AWeaponBase::SetCharacterOwner(AActor* TargetCharacterOwner)
 {
-	CharacterOwner = Cast<ABorisCharacter>(TargetCharacterOwner);
+	CharacterOwner = Cast<ACharacterBase>(TargetCharacterOwner);
 }
 
 void AWeaponBase::ResetActorsToIgnore()
 {
 	IgnoreActors.Reset();
 }
+
+
 
 void AWeaponBase::BeginPlay()
 {
@@ -40,14 +43,29 @@ void AWeaponBase::BeginPlay()
 	WeaponBoxCollider->OnComponentBeginOverlap.AddDynamic(this, &AWeaponBase::OnBoxOverlap);
 }
 
-void AWeaponBase::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator)
+void AWeaponBase::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, const FName& NewCollisionProfile)
 {
 	//ItemState = EItemState::EIS_Equipped;
+	SetCollisiontypeFoWeaponboxCollider(NewCollisionProfile);
 	SetOwner(NewOwner);
 	SetCharacterOwner(NewOwner);
 	SetInstigator(NewInstigator);
 	AttachMeshToSocket(InParent, InSocketName);
 	DisableSphereCollision();
+}
+void AWeaponBase::SetCollisiontypeFoWeaponboxCollider(const FName& NewCollisionProfile)
+{
+	if (WeaponBoxCollider)
+	{
+		WeaponBoxCollider->SetCollisionProfileName(NewCollisionProfile);
+
+		/*FCollisionResponseContainer CollisionResponseContainer;
+
+		CollisionResponseContainer.SetAllChannels(ECollisionResponse::ECR_Ignore);
+		CollisionResponseContainer.SetResponse(TargetCollisionChannel, ECollisionResponse::ECR_Overlap);
+
+		WeaponBoxCollider->SetCollisionResponseToChannels(CollisionResponseContainer);*/
+	}
 }
 
 void AWeaponBase::DisableSphereCollision()
@@ -79,7 +97,7 @@ void AWeaponBase::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	Super::OnSphereOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-	ABorisCharacter* Character = Cast<ABorisCharacter>(OtherActor);
+	ABorisCharacter* Character = Cast<ABorisCharacter>(OtherActor);	
 
 	if(Character)
 		Character->EquipWeapon(this);
@@ -88,33 +106,48 @@ void AWeaponBase::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 void AWeaponBase::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	Super::OnSphereEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
-
 }
 
 void AWeaponBase::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	IgnoreActors.AddUnique(this);
+	if (IgnoreActors.Contains(OtherActor))
+		return;
+
 	const FVector Start = BoxTraceStart->GetComponentLocation();
 	const FVector End = BoxTraceEnd->GetComponentLocation();
-		
-	IgnoreActors.AddUnique(this);
+
+	//GEngine->AddOnScreenDebugMessage(-1, 25.f, FColor::Yellow.WithAlpha(100), FString::Printf(TEXT("Triggered component: %s in the Actor: %s"), *OtherComp->GetName(), *OtherActor->GetName()));
+
+	FVector BoxExtent = WeaponBoxCollider->GetScaledBoxExtent();
+
+	FVector BoxHitSize = FVector(BoxExtent.X, BoxExtent.Y, BoxExtent.Z * 0.1f) * 1.1f;
+
+
+	ECollisionChannel TargetChannel = OtherComp->GetCollisionObjectType();
 	FHitResult BoxHit;
-	UKismetSystemLibrary::BoxTraceSingle(
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectQueryTypes;
+	ObjectQueryTypes.AddUnique(UEngineTypes::ConvertToObjectType(TargetChannel));
+
+	UKismetSystemLibrary::BoxTraceSingleForObjects(
 		this,
 		Start,
 		End,
-		FVector(5.f, 5.f, 5.f),
+		BoxHitSize * 1.1f,
 		BoxTraceStart->GetComponentRotation(),
-		ETraceTypeQuery::TraceTypeQuery1,
+		ObjectQueryTypes,
 		false,
 		IgnoreActors,
-		EDrawDebugTrace::None,
+		EDrawDebugTrace::ForDuration,
 		BoxHit,
 		true);
 
-	ApplyDamage(OtherActor);
+	if (!BoxHit.GetActor())
+		return;
 
-	if (BoxHit.GetActor())
-	{
-		IgnoreActors.AddUnique(BoxHit.GetActor());
-	}	
+	//GEngine->AddOnScreenDebugMessage(-1, 25.f, FColor::Green.WithAlpha(100), FString::Printf(TEXT("Box trace; ComponentTriggered: %s, Point of contact:%s, Actor: %s"), *BoxHit.GetComponent()->GetName(), *BoxHit.ImpactPoint.ToString(), *BoxHit.GetActor()->GetName()));
+
+	ApplyDamage(BoxHit.GetActor());
+
+	IgnoreActors.AddUnique(BoxHit.GetActor());
 }

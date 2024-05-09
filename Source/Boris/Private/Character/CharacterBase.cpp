@@ -15,12 +15,9 @@ ACharacterBase::ACharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	EquippedWeapon = CreateDefaultSubobject<AWeaponBase>("Weapon");
-
-	if (!EquippedWeapon)
-		return;
-
-	EquippedWeapon->GetMesh()->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
+	HitCapsuleCollider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Hit Collider"));
+	HitCapsuleCollider->SetupAttachment(GetRootComponent());
+	HitCapsuleCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 UBorisAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
@@ -66,7 +63,7 @@ void ACharacterBase::AddCharacterAbilities()
 	AbilitySystemComponent->AddCharacterAbilities(StartupAbilities);
 }
 
-FVector ACharacterBase::GetCombatSocketLocation()
+FVector ACharacterBase::GetCombatSocketLocation_Implementation()
 {
 	check(EquippedWeapon->GetMesh());
 
@@ -78,6 +75,13 @@ int32 ACharacterBase::GetPlayerLevel()
 	return int32();
 }
 
+void ACharacterBase::SetCollisionTypeForHitCollider(const FName& NewCollisionProfile)
+{
+	if (HitCapsuleCollider)
+	{
+		HitCapsuleCollider->SetCollisionProfileName(NewCollisionProfile);
+	}
+}
 void ACharacterBase::ActivateWeaponCollider()
 {
 	if (!EquippedWeapon->GetWeaponBoxCollider())
@@ -92,6 +96,14 @@ void ACharacterBase::DeactivateWeaponCollider()
 		return;
 
 	EquippedWeapon->GetWeaponBoxCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ACharacterBase::SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHandle IncomingAbilitySpecHandle)
+{
+	if (CharacterState != ECharacterState::ECS_EquippedWithWeapon)
+		return;
+
+	EquippedWeapon->DamageSpecHandle = IncomingAbilitySpecHandle;
 }
 
 void ACharacterBase::Die()

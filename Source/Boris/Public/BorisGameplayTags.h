@@ -40,6 +40,8 @@ public:
 	FGameplayTag Damage_Physical;
 	FGameplayTag Damage_Ranged;
 
+	FGameplayTag Abilities_Attack;
+
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
 
 	FGameplayTag InputTag_LMB;

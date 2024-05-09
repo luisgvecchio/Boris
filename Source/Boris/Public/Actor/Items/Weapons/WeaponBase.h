@@ -9,6 +9,7 @@
 
 class UBoxComponent;
 class ABorisCharacter;
+class ACharacterBase;
 
 //TODO: Erase after implementing Damage properly
 class UGameplayEffect;
@@ -25,7 +26,7 @@ public:
 
 	AWeaponBase();
 
-	void Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator);
+	void Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, const FName& NewCollisionProfile);
 
 	void DisableSphereCollision();
 
@@ -39,11 +40,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UBoxComponent> WeaponBoxCollider;
 
-	ABorisCharacter* GetCharacterOwner() const { return CharacterOwner; }
+	ACharacterBase* GetCharacterOwner() const { return CharacterOwner; }
 	void SetCharacterOwner(AActor* TargetCharacterOwner);
 
 	void ResetActorsToIgnore();
 	TArray<AActor*> GetActorsToIgnore() const { return IgnoreActors; }
+
+	void SetCollisiontypeFoWeaponboxCollider(const FName& NewCollisionProfile);
 
 protected:
 
@@ -59,7 +62,7 @@ protected:
 	UFUNCTION()
 	void OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	TObjectPtr<ABorisCharacter> CharacterOwner;
+	TObjectPtr<ACharacterBase> CharacterOwner;
 
 	TArray<AActor*> IgnoreActors;
 private:

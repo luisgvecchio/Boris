@@ -23,6 +23,15 @@ ABorisCharacter::ABorisCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
+
+	//Trace channel for PlayerAttack overlaps.
+	WeaponAttackOverlapChannel = ECollisionChannel::ECC_GameTraceChannel2;
+
+	WeaponAttackCollisionProfile = FName("PlayerAttackOverlap");
+
+	//Collision for HitCollider overlaps.
+	HitColliderCollisionProfile = FName("GetHitFromEnemy");
+	SetCollisionTypeForHitCollider(HitColliderCollisionProfile);
 }
 
 void ABorisCharacter::PossessedBy(AController* NewController)
@@ -67,20 +76,15 @@ void ABorisCharacter::InitAbilityActorInfo()
 
 void ABorisCharacter::EquipWeapon(AWeaponBase* Weapon)
 {
-	Weapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this);
+	if (!Weapon)
+		return;
 
 	EquippedWeapon = Weapon;
 	DeactivateWeaponCollider();
 
+	Weapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this, WeaponAttackCollisionProfile);
+
 	CharacterState = ECharacterState::ECS_EquippedWithWeapon;
-}
-
-void ABorisCharacter::SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHandle IncomingAbilitySpecHandle)
-{
-	if (CharacterState != ECharacterState::ECS_EquippedWithWeapon)
-		return;
-
-	EquippedWeapon->DamageSpecHandle = IncomingAbilitySpecHandle;
 }
 
 void ABorisCharacter::AttachWeaponToHand()

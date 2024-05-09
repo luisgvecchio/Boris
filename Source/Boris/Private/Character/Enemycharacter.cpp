@@ -13,6 +13,8 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Actor/Items/Weapons/WeaponBase.h"
 
 
 AEnemyCharacter::AEnemyCharacter()
@@ -26,19 +28,32 @@ AEnemyCharacter::AEnemyCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	AttributeSet = CreateDefaultSubobject<UBorisAttributeSet>("AttributeSet");
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBar->SetupAttachment(GetRootComponent());
+
+	ChildActorWeapon = CreateDefaultSubobject<UChildActorComponent>(TEXT("EnemyWeapon"));
+
+	//Object channel for EnemyAttack overlaps.
+	WeaponAttackOverlapChannel = ECollisionChannel::ECC_GameTraceChannel5;
+
+	//Collision for EnemyAttack overlaps.
+	WeaponAttackCollisionProfile = FName("EnemyAttack");
+
+	//Collision for HitCollider overlaps.
+	HitColliderCollisionProfile = FName("GetHitFromPlayer");
+	SetCollisionTypeForHitCollider(HitColliderCollisionProfile);
 }
 
 void AEnemyCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (!HasAuthority()) 
+	if (!HasAuthority())
 		return;
 
 	BorisAIController = Cast<ABorisAIController>(NewController);
@@ -52,6 +67,19 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Weapon Set
+	ChildActorWeapon->SetChildActorClass(EnemyWeaponClass);
+	ChildActorWeapon->CreateChildActor();
+
+	EquippedWeapon = Cast<AWeaponBase>(ChildActorWeapon->GetChildActor());
+
+	if (!EquippedWeapon)
+		return;
+	EquippedWeapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this, WeaponAttackCollisionProfile);
+	DeactivateWeaponCollider();
+	CharacterState = ECharacterState::ECS_EquippedWithWeapon;
+	//
+
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 
 	//Outline wehn under the mouse
@@ -62,6 +90,11 @@ void AEnemyCharacter::BeginPlay()
 
 	//AttributesInitialization
 	InitializeDefaultAttributes();
+
+	if (HasAuthority())
+	{
+		UBorisAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
+	}
 
 	if (UBorisUserWidget* BorisUserWidget = Cast<UBorisUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -143,3 +176,14 @@ void AEnemyCharacter::Die()
 	SetLifeSpan(LifeSpan);
 	Super::Die();
 }
+
+void AEnemyCharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
+}
+
+AActor* AEnemyCharacter::GetCombatTarget_Implementation() const
+{
+	return CombatTarget;
+}
+

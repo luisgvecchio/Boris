@@ -13,7 +13,7 @@ class UBorisAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayEffect;
 class UGameplayAbility;
-class UBoxComponent;
+class UCapsuleComponent;
 class AWeaponBase;
 class UAnimMontage;
 
@@ -46,10 +46,13 @@ public:
 	void ActivateWeaponCollider();
 	void DeactivateWeaponCollider();
 
+	void SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHandle IncomingAbilitySpecHandle);
+
 	virtual UBorisAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }	
-
 	virtual AWeaponBase* GetEquippedWeapon() const { return EquippedWeapon; }
+	ECollisionChannel GetWeaponAttackOverlapChannel() const { return WeaponAttackOverlapChannel.GetValue(); }
+	UCapsuleComponent* GetHitCollider() const { return HitCapsuleCollider; }
 
 	FORCEINLINE virtual ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE virtual ECharacterActionState GetActionState() const { return ActionState; }
@@ -62,17 +65,31 @@ public:
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	void SetCollisionTypeForHitCollider(const FName& NewCollisionProfile);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	AWeaponBase* EquippedWeapon = nullptr;	
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName WeaponTipSocketName;
 
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TEnumAsByte<ECollisionChannel> WeaponAttackOverlapChannel;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName WeaponAttackCollisionProfile;
+
+	UPROPERTY(VisibleAnywhere, Category = "Combat")
+	TObjectPtr<UCapsuleComponent> HitCapsuleCollider;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	FName HitColliderCollisionProfile;
+
 	UPROPERTY()
 	TObjectPtr<UBorisAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
-	TObjectPtr<UAttributeSet> AttributeSet;
+	TObjectPtr<UAttributeSet> AttributeSet;	
 
 	//Attributes
 
@@ -89,7 +106,7 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	virtual FVector GetCombatSocketLocation() override;
+	virtual FVector GetCombatSocketLocation_Implementation() override;
 	virtual int32 GetPlayerLevel() override;
 
 	void AddCharacterAbilities();

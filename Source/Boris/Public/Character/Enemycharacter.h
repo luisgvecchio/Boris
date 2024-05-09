@@ -14,6 +14,7 @@ class UWidgetComponent;
 class FOnAttributeChangedSignature;
 class UBehaviorTree;
 class ABorisAIController;
+class AWeaponBase;
 
 /**
  * 
@@ -32,13 +33,18 @@ public:
 	void HighlightActor() override;
 	void UnHighlightActor() override;
 
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+	virtual AActor* GetCombatTarget_Implementation() const override;
+
 	/** Combat Interface */
 	virtual int32 GetPlayerLevel() override;
+	virtual void Die() override;
 	/** end Combat Interface */
 
-	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<AActor> CombatTarget;
 
-	virtual void Die() override;
+	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
 	UPROPERTY(BlueprintReadOnly, Category = "Combat")
 	bool bHitReacting = false;
@@ -54,6 +60,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void InitializeDefaultAttributes() const override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	TSubclassOf<AWeaponBase> EnemyWeaponClass;
+
+	UPROPERTY(VisibleDefaultsOnly)
+	class UChildActorComponent* ChildActorWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* WeaponMesh;

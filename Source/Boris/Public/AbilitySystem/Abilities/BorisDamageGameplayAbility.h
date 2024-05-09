@@ -21,4 +21,18 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Damage")
 	TMap<FGameplayTag, FScalableFloat> DamageTypes;
+
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+public:
+
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+	virtual void UpdateDamageSpecHandle();
+
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+	virtual void StartAttack();
+
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+	virtual void FinishAtttack();
 };

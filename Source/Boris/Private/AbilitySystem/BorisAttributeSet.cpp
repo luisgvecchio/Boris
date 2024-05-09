@@ -38,7 +38,7 @@ UBorisAttributeSet::UBorisAttributeSet()
 
 	//Resistance Attributes
 	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Physical_Damage, GetPhysicalDamageResistanceAttribute);
-	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Ranged_Damage, GetRangedDamageResistanceAttribute);	
+	TagsToAttributes.Add(GameplayTags.Attributes_Resistance_Ranged_Damage, GetRangedDamageResistanceAttribute);
 }
 
 void UBorisAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -171,6 +171,11 @@ void UBorisAttributeSet::ShowFloatingText(const FEffectProperties& Props, float 
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
 		if (ABorisPlayerController* PC = Cast<ABorisPlayerController>(Props.SourceCharacter->Controller))
+		{
+			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
+			return;
+		}
+		if (ABorisPlayerController* PC = Cast<ABorisPlayerController>(Props.TargetCharacter->Controller))
 		{
 			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}
