@@ -43,30 +43,30 @@ class BORIS_API ACharacterBase : public ACharacter, public IAbilitySystemInterfa
 public:
 	ACharacterBase();
 
+	//Weapon
 	void ActivateWeaponCollider();
 	void DeactivateWeaponCollider();
-
 	void SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHandle IncomingAbilitySpecHandle);
-
+	
+	//Getters
 	virtual UBorisAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }	
 	virtual AWeaponBase* GetEquippedWeapon() const { return EquippedWeapon; }
 	ECollisionChannel GetWeaponAttackOverlapChannel() const { return WeaponAttackOverlapChannel.GetValue(); }
 	UCapsuleComponent* GetHitCollider() const { return HitCapsuleCollider; }
-
 	FORCEINLINE virtual ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE virtual ECharacterActionState GetActionState() const { return ActionState; }
-
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
-	virtual void Die() override;
+	//
 
+	//Death
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
+	virtual void Die() override;
 
 protected:
 
-	void SetCollisionTypeForHitCollider(const FName& NewCollisionProfile);
-
+	//Combat
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	AWeaponBase* EquippedWeapon = nullptr;	
 
@@ -84,14 +84,20 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	FName HitColliderCollisionProfile;
+	//
 
+	//ASC
 	UPROPERTY()
 	TObjectPtr<UBorisAbilitySystemComponent> AbilitySystemComponent;
 
-	UPROPERTY()
-	TObjectPtr<UAttributeSet> AttributeSet;	
+	//Abilities
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+
+	TArray<TSubclassOf<UGameplayAbility>> CurrentAbilities;
 
 	//Attributes
+	UPROPERTY()
+	TObjectPtr<UAttributeSet> AttributeSet;	
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
@@ -102,16 +108,22 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
-	//Functions
-
+	//FUNCTIONS
 	virtual void BeginPlay() override;
 
 	virtual FVector GetCombatSocketLocation_Implementation() override;
 	virtual int32 GetPlayerLevel() override;
 
-	void AddCharacterAbilities();
+	void AddCharacterStartUpAbilities();
+	void AddCharacterAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToAdd);
+	void RemoveAllCharacterAbilities();
+	void RemoveGivenCharacterAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToRemove);
+
+
 	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
 	virtual void InitializeDefaultAttributes() const;
+
+	void SetCollisionTypeForHitCollider(const FName& NewCollisionProfile);
 
 	//States
 

@@ -41,7 +41,7 @@ void ABorisCharacter::PossessedBy(AController* NewController)
 	// Init ability actor info for the Server
 	InitAbilityActorInfo();
 
-	AddCharacterAbilities();
+	AddCharacterStartUpAbilities();
 
 }
 
@@ -79,13 +79,44 @@ void ABorisCharacter::EquipWeapon(AWeaponBase* Weapon)
 	if (!Weapon)
 		return;
 
+	UnequipCurrentEquippedWeapon();
+
+	//Remove the Abilities of the last EquippedWeapon if any
+	if (EquippedWeapon)
+	{
+		RemoveGivenCharacterAbilities(EquippedWeapon->GetWeaponAbilitiesForPlayers());
+	}
+
 	EquippedWeapon = Weapon;
 	DeactivateWeaponCollider();
 
 	Weapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this, WeaponAttackCollisionProfile);
 
+	//Add Character Abilities after equipping the new Weapon
+	AddCharacterAbilities(EquippedWeapon->GetWeaponAbilitiesForPlayers());
+
 	CharacterState = ECharacterState::ECS_EquippedWithWeapon;
 }
+
+void ABorisCharacter::UnequipCurrentEquippedWeapon()
+{
+	if (!EquippedWeapon)
+		return;
+
+	EquippedWeapon->GetMesh()->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+
+	auto WeaponMesh = EquippedWeapon->GetMesh();
+
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	WeaponMesh->SetEnableGravity(true);
+	WeaponMesh->SetSimulatePhysics(true);
+
+	//Timer to activate the sphere collider to be able to pick up the weapon again
+	GetWorldTimerManager().SetTimer(EquippedWeapon->SphereCollisionTimer, EquippedWeapon, &AWeaponBase::EnableSphereCollision, 2, false);
+
+	EquippedWeapon = nullptr;
+}
+
 
 void ABorisCharacter::AttachWeaponToHand()
 {

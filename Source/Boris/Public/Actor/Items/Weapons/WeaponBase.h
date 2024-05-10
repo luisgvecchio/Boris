@@ -28,17 +28,13 @@ public:
 
 	void Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, const FName& NewCollisionProfile);
 
+	void EnableSphereCollision();
 	void DisableSphereCollision();
+	void SetCollisiontypeFoWeaponboxCollider(const FName& NewCollisionProfile);
 
 	void AttachMeshToSocket(USceneComponent* InParent, const FName& InSocketName);
 
 	FORCEINLINE UBoxComponent* GetWeaponBoxCollider() { return WeaponBoxCollider; }
-
-	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
-	FGameplayEffectSpecHandle DamageSpecHandle;
-
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TObjectPtr<UBoxComponent> WeaponBoxCollider;
 
 	ACharacterBase* GetCharacterOwner() const { return CharacterOwner; }
 	void SetCharacterOwner(AActor* TargetCharacterOwner);
@@ -46,7 +42,15 @@ public:
 	void ResetActorsToIgnore();
 	TArray<AActor*> GetActorsToIgnore() const { return IgnoreActors; }
 
-	void SetCollisiontypeFoWeaponboxCollider(const FName& NewCollisionProfile);
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	FGameplayEffectSpecHandle DamageSpecHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UBoxComponent> WeaponBoxCollider;
+
+	TArray<TSubclassOf<UGameplayAbility>> GetWeaponAbilitiesForPlayers() const { return WeaponAbilitiesForPlayers; }
+
+	FTimerHandle SphereCollisionTimer;
 
 protected:
 
@@ -65,6 +69,10 @@ protected:
 	TObjectPtr<ACharacterBase> CharacterOwner;
 
 	TArray<AActor*> IgnoreActors;
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> WeaponAbilitiesForPlayers;
+
 private:
 
 	UPROPERTY(VisibleAnywhere)

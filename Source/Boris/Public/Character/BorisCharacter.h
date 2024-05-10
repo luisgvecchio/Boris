@@ -31,6 +31,7 @@ public:
 	//TODO: Manage Action State// FORCEINLINE EActionState GetActionState() const { return ActionState; }
 
 	void EquipWeapon(AWeaponBase* Weapon);
+	void UnequipCurrentEquippedWeapon();
 
 	void SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHandle IncomingAbilitySpecHandle);
 

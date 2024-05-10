@@ -17,6 +17,8 @@ AWeaponBase::AWeaponBase()
 	WeaponBoxCollider->SetupAttachment(GetRootComponent());
 	WeaponBoxCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);//SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	BoxTraceStart = CreateDefaultSubobject<USceneComponent>(TEXT("Box Trace Start"));
 	BoxTraceStart->SetupAttachment(GetRootComponent());
 
@@ -34,8 +36,6 @@ void AWeaponBase::ResetActorsToIgnore()
 	IgnoreActors.Reset();
 }
 
-
-
 void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -46,6 +46,12 @@ void AWeaponBase::BeginPlay()
 void AWeaponBase::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOwner, APawn* NewInstigator, const FName& NewCollisionProfile)
 {
 	//ItemState = EItemState::EIS_Equipped;
+	if (GetWorldTimerManager().IsTimerActive((SphereCollisionTimer)))
+		GetWorldTimerManager().ClearTimer(SphereCollisionTimer);
+
+	GetMesh()->SetSimulatePhysics(false);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	SetCollisiontypeFoWeaponboxCollider(NewCollisionProfile);
 	SetOwner(NewOwner);
 	SetCharacterOwner(NewOwner);
@@ -53,18 +59,20 @@ void AWeaponBase::Equip(USceneComponent* InParent, FName InSocketName, AActor* N
 	AttachMeshToSocket(InParent, InSocketName);
 	DisableSphereCollision();
 }
+
 void AWeaponBase::SetCollisiontypeFoWeaponboxCollider(const FName& NewCollisionProfile)
 {
 	if (WeaponBoxCollider)
 	{
 		WeaponBoxCollider->SetCollisionProfileName(NewCollisionProfile);
+	}
+}
 
-		/*FCollisionResponseContainer CollisionResponseContainer;
-
-		CollisionResponseContainer.SetAllChannels(ECollisionResponse::ECR_Ignore);
-		CollisionResponseContainer.SetResponse(TargetCollisionChannel, ECollisionResponse::ECR_Overlap);
-
-		WeaponBoxCollider->SetCollisionResponseToChannels(CollisionResponseContainer);*/
+void AWeaponBase::EnableSphereCollision()
+{
+	if (Sphere)
+	{
+		Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}
 }
 

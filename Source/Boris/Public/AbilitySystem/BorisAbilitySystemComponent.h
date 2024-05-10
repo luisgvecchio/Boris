@@ -23,6 +23,7 @@ public:
 	void InitActorInfo(AActor* InOwnerActor, AActor* InAvatarActor);
 
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
+	void RemoveCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToRemove);
 
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);

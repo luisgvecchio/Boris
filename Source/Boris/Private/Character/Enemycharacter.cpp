@@ -67,18 +67,21 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Weapon Set
-	ChildActorWeapon->SetChildActorClass(EnemyWeaponClass);
-	ChildActorWeapon->CreateChildActor();
+	//Equip weapon if any
+	if (EnemyWeaponClass)
+	{
+		//Set the given Weapon to the Child Actor component
+		ChildActorWeapon->SetChildActorClass(EnemyWeaponClass);
+		ChildActorWeapon->CreateChildActor();
 
-	EquippedWeapon = Cast<AWeaponBase>(ChildActorWeapon->GetChildActor());
+		EquippedWeapon = Cast<AWeaponBase>(ChildActorWeapon->GetChildActor());
+		if (!EquippedWeapon)
+			return;
 
-	if (!EquippedWeapon)
-		return;
-	EquippedWeapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this, WeaponAttackCollisionProfile);
-	DeactivateWeaponCollider();
-	CharacterState = ECharacterState::ECS_EquippedWithWeapon;
-	//
+		EquippedWeapon->Equip(GetMesh(), FName("WeaponHandSocket"), this, this, WeaponAttackCollisionProfile);
+		DeactivateWeaponCollider();
+		CharacterState = ECharacterState::ECS_EquippedWithWeapon;
+	}
 
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 
@@ -91,16 +94,19 @@ void AEnemyCharacter::BeginPlay()
 	//AttributesInitialization
 	InitializeDefaultAttributes();
 
+	//Add Enemy Abilities
 	if (HasAuthority())
 	{
 		UBorisAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
+		AddCharacterStartUpAbilities();
 	}
-
+	//Set Widget Controller
 	if (UBorisUserWidget* BorisUserWidget = Cast<UBorisUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
 		BorisUserWidget->SetWidgetController(this);
 	}
 
+	//Subscribe to Attribute changes
 	if (const UBorisAttributeSet* BorisAS = Cast<UBorisAttributeSet>(AttributeSet))
 	{
 		AddLambdaListenerToAttributeChange(OnHealthChanged, BorisAS->GetHealthAttribute());
@@ -112,6 +118,7 @@ void AEnemyCharacter::BeginPlay()
 		OnMaxHealthChanged.Broadcast(BorisAS->GetMaxHealth());
 	}
 }
+
 void AEnemyCharacter::AddLambdaListenerToAttributeChange(FOnAttributeChangedSignature& TargetAttributeChangeSignature, FGameplayAttribute EventToListenTo)
 {
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(EventToListenTo).AddLambda(

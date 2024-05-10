@@ -32,7 +32,7 @@ UAnimMontage* ACharacterBase::GetHitReactMontage_Implementation()
 
 void ACharacterBase::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 }
 
 void ACharacterBase::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
@@ -55,12 +55,53 @@ void ACharacterBase::InitializeDefaultAttributes() const
 	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 }
 
-void ACharacterBase::AddCharacterAbilities()
+void ACharacterBase::AddCharacterStartUpAbilities()
 {
-	if (!HasAuthority()) 
+	if (!HasAuthority())
 		return;
 
 	AbilitySystemComponent->AddCharacterAbilities(StartupAbilities);
+
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
+	{
+		CurrentAbilities.Add(AbilityClass);
+	}
+}
+
+void ACharacterBase::AddCharacterAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToAdd)
+{
+	if (!HasAuthority())
+		return;
+
+	AbilitySystemComponent->AddCharacterAbilities(AbilitiesToAdd);
+
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : AbilitiesToAdd)
+	{
+		CurrentAbilities.Add(AbilityClass);
+	}
+}
+
+void ACharacterBase::RemoveGivenCharacterAbilities(TArray<TSubclassOf<UGameplayAbility>> AbilitiesToRemove)
+{
+	if (!HasAuthority())
+		return;
+
+	AbilitySystemComponent->RemoveCharacterAbilities(AbilitiesToRemove);
+
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : AbilitiesToRemove)
+	{
+		CurrentAbilities.RemoveSingle(AbilityClass);
+	}
+}
+
+void ACharacterBase::RemoveAllCharacterAbilities()
+{
+	if (!HasAuthority())
+		return;
+
+	AbilitySystemComponent->ClearAllAbilities();
+
+	CurrentAbilities.Reset();
 }
 
 FVector ACharacterBase::GetCombatSocketLocation_Implementation()
@@ -108,7 +149,9 @@ void ACharacterBase::SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHa
 
 void ACharacterBase::Die()
 {
-	EquippedWeapon->GetMesh()->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+	if(EquippedWeapon)
+		EquippedWeapon->GetMesh()->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
+
 	MulticastHandleDeath();
 }
 
@@ -135,10 +178,8 @@ void ACharacterBase::MulticastHandleDeath_Implementation()
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	UCapsuleComponent* HitCollider = Cast<UCapsuleComponent>(GetDefaultSubobjectByName(TEXT("HitCollider")));
-
-	if(HitCollider)
-		HitCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if (HitCapsuleCollider)
+		HitCapsuleCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	DissolveMaterials();
 }
