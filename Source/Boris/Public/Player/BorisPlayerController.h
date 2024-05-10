@@ -31,6 +31,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
 
+	UFUNCTION(BlueprintCallable, Category = "Mouse")
+	FHitResult GetCursorHit() { return CursorHit; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;

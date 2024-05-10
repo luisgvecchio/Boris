@@ -53,10 +53,10 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }	
 	virtual AWeaponBase* GetEquippedWeapon() const { return EquippedWeapon; }
 	ECollisionChannel GetWeaponAttackOverlapChannel() const { return WeaponAttackOverlapChannel.GetValue(); }
-	UCapsuleComponent* GetHitCollider() const { return HitCapsuleCollider; }
 	FORCEINLINE virtual ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE virtual ECharacterActionState GetActionState() const { return ActionState; }
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+	virtual UCapsuleComponent* GetHitCollider_Implementation() const override { return HitCapsuleCollider; }
 	//
 
 	//Death

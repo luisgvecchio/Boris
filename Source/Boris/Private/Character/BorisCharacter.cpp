@@ -81,12 +81,6 @@ void ABorisCharacter::EquipWeapon(AWeaponBase* Weapon)
 
 	UnequipCurrentEquippedWeapon();
 
-	//Remove the Abilities of the last EquippedWeapon if any
-	if (EquippedWeapon)
-	{
-		RemoveGivenCharacterAbilities(EquippedWeapon->GetWeaponAbilitiesForPlayers());
-	}
-
 	EquippedWeapon = Weapon;
 	DeactivateWeaponCollider();
 
@@ -102,6 +96,9 @@ void ABorisCharacter::UnequipCurrentEquippedWeapon()
 {
 	if (!EquippedWeapon)
 		return;
+
+	//Remove the Abilities of the last EquippedWeapon if any
+	RemoveGivenCharacterAbilities(EquippedWeapon->GetWeaponAbilitiesForPlayers());
 
 	EquippedWeapon->GetMesh()->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 

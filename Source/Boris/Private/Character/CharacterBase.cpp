@@ -64,7 +64,7 @@ void ACharacterBase::AddCharacterStartUpAbilities()
 
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
 	{
-		CurrentAbilities.Add(AbilityClass);
+		CurrentAbilities.AddUnique(AbilityClass);
 	}
 }
 
@@ -77,7 +77,7 @@ void ACharacterBase::AddCharacterAbilities(TArray<TSubclassOf<UGameplayAbility>>
 
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : AbilitiesToAdd)
 	{
-		CurrentAbilities.Add(AbilityClass);
+		CurrentAbilities.AddUnique(AbilityClass);
 	}
 }
 

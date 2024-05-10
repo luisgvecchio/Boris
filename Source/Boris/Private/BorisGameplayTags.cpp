@@ -127,6 +127,11 @@ void FBorisGameplayTags::InitializeNativeGameplayTags()
 		FName("InputTag.Space"),
 		FString("Input Tag for Space key")
 	);
+	GameplayTags.InputTag_E = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.E"),
+		FString("Input Tag for Space key")
+	);
+
 
 	//Damage Types
 

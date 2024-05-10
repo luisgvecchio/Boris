@@ -20,14 +20,26 @@ void UBorisAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassO
 
 void UBorisAbilitySystemComponent::RemoveCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& AbilitiesToRemove)
 {
+	TArray<FGameplayAbilitySpecHandle> GrantedAbilities;	
+
+	GetAllAbilities(GrantedAbilities);
+
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : AbilitiesToRemove)
 	{
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		FGameplayAbilitySpec AbilitySpecToRemove = FGameplayAbilitySpec(AbilityClass, 1);
 
-		if (const UBorisGameplayAbility* BorisAbility = Cast<UBorisGameplayAbility>(AbilitySpec.Ability))
+		for (const FGameplayAbilitySpecHandle GrantedAbilitySpecHandle : GrantedAbilities)
 		{
-			AbilitySpec.DynamicAbilityTags.RemoveTag(BorisAbility->StartupInputTag);
-			ClearAbility(AbilitySpec.Handle);
+			FGameplayAbilitySpec* GrantedAbilitySpec = FindAbilitySpecFromHandle(GrantedAbilitySpecHandle);
+
+			if (GrantedAbilitySpec->Ability->GetClass() == AbilitySpecToRemove.Ability.GetClass())
+			{
+				if (const UBorisGameplayAbility* AbilityToRemove = Cast<UBorisGameplayAbility>(AbilitySpecToRemove.Ability))
+				{
+					GrantedAbilitySpec->DynamicAbilityTags.RemoveTag(AbilityToRemove->StartupInputTag);
+					ClearAbility(GrantedAbilitySpec->Handle);
+				}
+			}
 		}
 	}
 }
