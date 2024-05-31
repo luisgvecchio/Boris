@@ -18,4 +18,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	FGameplayTag StartupInputTag;
+
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	bool CheckIfActive();
 };

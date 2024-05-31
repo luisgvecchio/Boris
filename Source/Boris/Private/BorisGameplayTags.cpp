@@ -131,6 +131,10 @@ void FBorisGameplayTags::InitializeNativeGameplayTags()
 		FName("InputTag.E"),
 		FString("Input Tag for Space key")
 	);
+	GameplayTags.InputTag_Inventory = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag.Inventory"),
+		FString("Input Tag for Inventory")
+	);
 
 
 	//Damage Types

@@ -11,8 +11,6 @@ ABorisEffectActor::ABorisEffectActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	PrimaryActorTick.bCanEverTick = false;
-
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
 }
 

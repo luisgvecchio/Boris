@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Inventory/Data/ItemTypes.h"
+
 #include "ItemBase.generated.h"
 
 class USphereComponent;
+class UItemTypes;
 
 UCLASS()
 class BORIS_API AItemBase : public AActor
@@ -19,6 +22,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	FORCEINLINE UStaticMeshComponent* GetMesh() const { return ItemMesh; }
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+	UItemTypes* ItemType;
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,5 +43,5 @@ protected:
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float RunningTime;
+	float RunningTime;	
 };

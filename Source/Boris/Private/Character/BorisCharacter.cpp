@@ -10,11 +10,13 @@
 #include "UI/HUD/BorisHUD.h"
 #include "Components/BoxComponent.h"
 #include "Actor/Items/Weapons/WeaponBase.h"
-
+#include "Inventory/InventoryBaseComponent.h"
 
 
 ABorisCharacter::ABorisCharacter()
 {
+	InventoryComponent = CreateDefaultSubobject<UInventoryBaseComponent>(TEXT("Inventory component"));
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 450.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;

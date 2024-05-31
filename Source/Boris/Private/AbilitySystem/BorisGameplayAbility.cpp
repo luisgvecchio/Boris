@@ -3,3 +3,7 @@
 
 #include "AbilitySystem/BorisGameplayAbility.h"
 
+bool UBorisGameplayAbility::CheckIfActive()
+{
+	return IsActive();
+}

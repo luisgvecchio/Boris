@@ -88,7 +88,7 @@ protected:
 
 	//ASC
 	UPROPERTY()
-	TObjectPtr<UBorisAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UBorisAbilitySystemComponent> AbilitySystemComponent;	
 
 	//Abilities
 	UPROPERTY(EditAnywhere, Category = "Abilities")

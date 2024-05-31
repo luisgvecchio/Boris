@@ -48,6 +48,7 @@ void UBorisAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	//Vital Atributtes
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 
 	//PrimaryAttributes
 
@@ -67,7 +68,6 @@ void UBorisAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Endurance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MovementSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UBorisAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 
 	//Resistance Attributes
 
@@ -188,7 +188,10 @@ void UBorisAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) c
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Health, OldHealth)
 }
-
+void UBorisAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, MaxHealth, OldMaxHealth)
+}
 
 //Primary Attributes
 
@@ -257,11 +260,6 @@ void UBorisAttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldMo
 void UBorisAttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStamina) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, Stamina, OldStamina);
-}
-
-void UBorisAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth) const
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UBorisAttributeSet, MaxHealth, OldMaxHealth)
 }
 
 // Resistances

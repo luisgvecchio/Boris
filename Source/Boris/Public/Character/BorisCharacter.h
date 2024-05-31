@@ -6,6 +6,7 @@
 #include "Character/CharacterBase.h"
 #include "BorisCharacter.generated.h"
 
+class UInventoryBaseComponent;
 class AWeaponBase;
 
 /**
@@ -26,6 +27,8 @@ public:
 	virtual int32 GetPlayerLevel() override;
 	/** end Combat Interface */
 
+	UFUNCTION(BlueprintCallable)
+	UInventoryBaseComponent* GetInventoryComponent() { return InventoryComponent; }
 
 	//FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 	//TODO: Manage Action State// FORCEINLINE EActionState GetActionState() const { return ActionState; }
@@ -39,6 +42,10 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void AttachWeaponToHand();
+
+	//Inventory
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInventoryBaseComponent> InventoryComponent;
 
 private:
 

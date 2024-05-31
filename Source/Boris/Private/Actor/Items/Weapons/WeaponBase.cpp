@@ -10,6 +10,8 @@
 #include "Character/BorisCharacter.h"
 #include "AbilitySystem/BorisAbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Inventory/InventoryBaseComponent.h"
+
 
 AWeaponBase::AWeaponBase()
 {
@@ -107,8 +109,15 @@ void AWeaponBase::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 	ABorisCharacter* Character = Cast<ABorisCharacter>(OtherActor);	
 
-	if(Character)
+	if (Character && Character->GetCharacterState() == ECharacterState::ECS_EquippedWithWeapon)
+	{
+		Character->GetInventoryComponent()->AddItemToInventory(this);
+	}
+	else if (Character)
+	{
+		Character->GetInventoryComponent()->AddItemToInventory(this);
 		Character->EquipWeapon(this);
+	}
 }
 
 void AWeaponBase::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

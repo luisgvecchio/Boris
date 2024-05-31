@@ -52,6 +52,7 @@ public:
 	FGameplayTag InputTag_4;
 	FGameplayTag InputTag_Space;
 	FGameplayTag InputTag_E;
+	FGameplayTag InputTag_Inventory;
 
 	FGameplayTag Effects_HitReact;
 
