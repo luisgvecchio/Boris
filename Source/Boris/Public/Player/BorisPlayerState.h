@@ -7,6 +7,7 @@
 #include "AbilitySystemInterface.h"
 #include "BorisPlayerState.generated.h"
 
+class UAbilitySystemComponent;
 class UBorisAbilitySystemComponent;
 class UAttributeSet;
 
@@ -24,7 +25,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual UBorisAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UBorisAbilitySystemComponent* GetBorisAbilitySystemComponent() const;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	FORCEINLINE int32 GetPlayerLevel() const { return Level; }

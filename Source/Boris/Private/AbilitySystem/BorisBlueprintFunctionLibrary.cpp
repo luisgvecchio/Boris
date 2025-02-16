@@ -18,7 +18,7 @@ UOverlayWidgetController* UBorisAbilitySystemLibrary::GetOverlayWidgetController
 		if (ABorisHUD* BorisHUD = Cast<ABorisHUD>(PC->GetHUD()))
 		{
 			ABorisPlayerState* PS = PC->GetPlayerState<ABorisPlayerState>();
-			UBorisAbilitySystemComponent* ASC = PS->GetAbilitySystemComponent();
+			UBorisAbilitySystemComponent* ASC = PS->GetBorisAbilitySystemComponent();
 			UAttributeSet* AS = PS->GetAttributeSet();
 			const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
 			return BorisHUD->GetOverlayWidgetController(WidgetControllerParams);

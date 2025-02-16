@@ -9,6 +9,7 @@
 #include "GameplayEffectTypes.h"
 #include "CharacterBase.generated.h"
 
+class UAbilitySystemComponent;
 class UBorisAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayEffect;
@@ -49,7 +50,8 @@ public:
 	void SendAbilitySpecHandleToEquippedWeapon(FGameplayEffectSpecHandle IncomingAbilitySpecHandle);
 	
 	//Getters
-	virtual UBorisAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UBorisAbilitySystemComponent* GetBorisAbilitySystemComponent() const;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }	
 	virtual AWeaponBase* GetEquippedWeapon() const { return EquippedWeapon; }
 	ECollisionChannel GetWeaponAttackOverlapChannel() const { return WeaponAttackOverlapChannel.GetValue(); }

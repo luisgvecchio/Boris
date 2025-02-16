@@ -89,7 +89,7 @@ void AEnemyCharacter::BeginPlay()
 	GetMesh()->SetCustomDepthStencilValue(CUSTOM_DEPTH_RED_OUTLINE);
 
 	//Abilitysystem Initialization
-	GetAbilitySystemComponent()->InitActorInfo(this, this);
+	GetBorisAbilitySystemComponent()->InitActorInfo(this, this);
 
 	//AttributesInitialization
 	InitializeDefaultAttributes();

@@ -20,7 +20,11 @@ ACharacterBase::ACharacterBase()
 	HitCapsuleCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-UBorisAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
+UAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+UBorisAbilitySystemComponent* ACharacterBase::GetBorisAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }

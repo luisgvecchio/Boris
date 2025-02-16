@@ -25,7 +25,12 @@ void ABorisPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ABorisPlayerState, Level);
 }
 
-UBorisAbilitySystemComponent* ABorisPlayerState::GetAbilitySystemComponent() const
+UAbilitySystemComponent* ABorisPlayerState::GetAbilitySystemComponent() const
+{
+	return GetBorisAbilitySystemComponent();
+}
+
+UBorisAbilitySystemComponent* ABorisPlayerState::GetBorisAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
 }
